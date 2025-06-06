@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml.Media;
 using NeoIsisJob.Proxy;
+
 // using Windows.UI;
 using Workout.Core.Models;
 
@@ -125,11 +126,11 @@ namespace NeoIsisJob.ViewModels.Rankings
             // Hardcoded rankings data to avoid API issues
             var hardcodedRankings = new Dictionary<int, RankingModel>
             {
-                { 1, new RankingModel(1, 1, 2000) }, // Chest: 2000 points
-                { 2, new RankingModel(1, 2, 7800) }, // Legs: 7800 points  
-                { 3, new RankingModel(1, 3, 6700) }, // Arms: 6700 points
-                { 4, new RankingModel(1, 4, 9600) }, // Abs: 9600 points
-                { 5, new RankingModel(1, 5, 3700) }  // Back: 3700 points
+                { 1, new RankingModel(AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1, 1, 2000) }, // Chest: 2000 points
+                { 2, new RankingModel(AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1, 2, 7800) }, // Legs: 7800 points  
+                { 3, new RankingModel(AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1, 3, 6700) }, // Arms: 6700 points
+                { 4, new RankingModel(AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1, 4, 9600) }, // Abs: 9600 points
+                { 5, new RankingModel(AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1, 5, 3700) },  // Back: 3700 points
             };
 
             // Return hardcoded data immediately
@@ -139,7 +140,8 @@ namespace NeoIsisJob.ViewModels.Rankings
             }
 
             // Fallback to default if muscle group not found
-            return await Task.FromResult(new RankingModel(1, muscleGroupid, 1000)); // Default: 1000 points
+            return await Task.FromResult(new RankingModel(AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1,
+                muscleGroupid, 1000)); // Default: 1000 points
         }
 
         public SolidColorBrush GetRankColor(int rank)

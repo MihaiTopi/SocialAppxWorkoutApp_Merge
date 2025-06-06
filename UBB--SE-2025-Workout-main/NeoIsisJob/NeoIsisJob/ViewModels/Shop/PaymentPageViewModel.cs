@@ -4,14 +4,10 @@
 
 namespace NeoIsisJob.ViewModels.Shop
 {
-    using NeoIsisJob.Proxy;
     using System;
-    using System.Collections.Generic;
-    using System.Configuration;
     using System.Diagnostics;
-    using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
+    using NeoIsisJob.Proxy;
 
 
     /// <summary>
@@ -20,7 +16,7 @@ namespace NeoIsisJob.ViewModels.Shop
     public class PaymentPageViewModel
     {
         private readonly OrderServiceProxy orderServiceProxy;
-        private readonly int userId = 1; // This should be replaced with the actual user ID from the session or authentication context.
+        private readonly int userId = AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1; // This should be replaced with the actual user ID from the session or authentication context.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PaymentPageViewModel"/> class.

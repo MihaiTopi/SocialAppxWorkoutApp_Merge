@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Workout.Core.Models;
 using NeoIsisJob.Proxy;
+using Workout.Core.Models;
 
 namespace NeoIsisJob.ViewModels.Shop
 {
     public class FavouriteMealsViewModel
     {
         private readonly UserFavoriteMealServiceProxy _favoriteMealServiceProxy;
-        private readonly int userId = 1; // Replace with actual user ID from session/auth
+        private readonly int userId = AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1; // Replace with actual user ID from session/auth
 
         public FavouriteMealsViewModel()
         {
@@ -35,4 +35,4 @@ namespace NeoIsisJob.ViewModels.Shop
             return await _favoriteMealServiceProxy.IsMealFavoriteAsync(userId, mealId);
         }
     }
-} 
+}

@@ -27,8 +27,15 @@
             </NavigationView.MenuItems>
 
             <NavigationView.PaneFooter>
-                <NavigationViewItem Content="Login" Tag="LoginPage" Tapped="GoToLoginPage_Tap" HorizontalAlignment="Right"/>
+                <StackPanel HorizontalAlignment="Right" Margin="12,0,12,12">
+                 <TextBlock
+                   x:Name="UserGreetingTextBlock"
+                   FontWeight="SemiBold" 
+                   FontSize="14"
+                   VerticalAlignment="Center"/>
+                </StackPanel>
             </NavigationView.PaneFooter>
+
 
             <!-- Content area that shows either the frame content or main page content -->
             <Grid>

@@ -1,20 +1,16 @@
-﻿using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
-using System.Linq;
-using System;
 using System.Diagnostics;
-using System.Net.Http;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows.Input;
 // using NeoIsisJob.Models;
 // using NeoIsisJob.Services;
 using NeoIsisJob.Commands;
-using Workout.Core.Models;
-using Workout.Core.IServices;
-using NeoIsisJob.Helpers;
-using Refit;
 using NeoIsisJob.Proxy;
+using Workout.Core.Models;
 
 namespace NeoIsisJob.ViewModels.Classes
 {
@@ -289,7 +285,7 @@ namespace NeoIsisJob.ViewModels.Classes
             }
         }
 
-        private int currentUserId = 1;
+        private int currentUserId = AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1;
 
         public int CurrentUserId
         {

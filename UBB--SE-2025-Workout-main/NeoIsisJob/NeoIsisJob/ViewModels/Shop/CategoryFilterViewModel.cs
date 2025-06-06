@@ -6,12 +6,11 @@ using Workout.Core.Models;
 
 namespace NeoIsisJob.ViewModels.Shop
 {
-    using NeoIsisJob.Proxy;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
+    using NeoIsisJob.Proxy;
 
 
 
@@ -39,7 +38,7 @@ namespace NeoIsisJob.ViewModels.Shop
         /// <summary>
         /// Gets the list of available categories.
         /// </summary>
-        public ObservableCollection<CategoryModel> Categories { get; } = new ();
+        public ObservableCollection<CategoryModel> Categories { get; } = new();
 
         /// <summary>
         /// Gets or sets the selected category.

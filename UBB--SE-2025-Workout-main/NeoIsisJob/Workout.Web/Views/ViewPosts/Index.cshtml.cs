@@ -75,6 +75,9 @@ public class IndexModel : PageModel
         }
 
         int userId = 1; // Hardcoded user ID for testing
+        var userIdString = HttpContext.Session.GetString("UserId");
+        if (userIdString != null)
+            userId = int.Parse(userIdString);
 
         var reactionType = Enum.Parse<ReactionType>(type);
         var existing = _reactionRepository.GetReaction(userId, postId);

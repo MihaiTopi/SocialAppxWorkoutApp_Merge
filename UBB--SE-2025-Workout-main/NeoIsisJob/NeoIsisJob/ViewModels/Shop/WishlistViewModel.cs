@@ -4,10 +4,10 @@
 
 namespace NeoIsisJob.ViewModels.Shop
 {
-    using global::Workout.Core.Models;
-    using NeoIsisJob.Proxy;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using global::Workout.Core.Models;
+    using NeoIsisJob.Proxy;
 
     /// <summary>
     /// ViewModel responsible for managing wishlist operations.
@@ -15,7 +15,7 @@ namespace NeoIsisJob.ViewModels.Shop
     public class WishlistViewModel
     {
         private readonly WishlistServiceProxy wishlistServiceProxy;
-        private readonly int userId = 1; // This should be replaced with the actual user ID from the session or authentication context.
+        private readonly int userId = AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1; // This should be replaced with the actual user ID from the session or authentication context.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WishlistViewModel"/> class.

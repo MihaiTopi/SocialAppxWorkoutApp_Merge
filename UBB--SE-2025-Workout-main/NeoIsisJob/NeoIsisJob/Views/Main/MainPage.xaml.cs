@@ -24,7 +24,6 @@ namespace NeoIsisJob.Views
         private List<ExerciseWithDetails> currentWorkoutExercises;
 
         // Test user ID (for testing purposes only)
-        private readonly int currentUserId = 1;
 
         // Helper class to display exercise details
         private class ExerciseWithDetails
@@ -41,6 +40,7 @@ namespace NeoIsisJob.Views
         public MainPage()
         {
             this.InitializeComponent();
+            UserGreetingTextBlock.Text = "Hello, " + AppController.CurrentUser.Username;
 
             // Initialize services
             workoutService = new WorkoutServiceProxy();
@@ -198,7 +198,7 @@ namespace NeoIsisJob.Views
                 // 3) POST to calendar/userworkout
                 var today = DateTime.Now.Date;
                 var uw = new UserWorkoutModel(
-                    userId: currentUserId,
+                    userId: AppController.CurrentUser.ID,
                     workoutId: selected.WID,
                     date: today,
                     completed: false);

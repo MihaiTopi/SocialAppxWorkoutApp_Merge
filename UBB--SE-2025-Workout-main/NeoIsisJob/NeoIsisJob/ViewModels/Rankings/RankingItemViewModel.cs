@@ -7,4 +7,4 @@ namespace NeoIsisJob.ViewModels.Rankings
         public int Points { get; set; }
         public string ActivityDescription { get; set; } = string.Empty;
     }
-} 
+}

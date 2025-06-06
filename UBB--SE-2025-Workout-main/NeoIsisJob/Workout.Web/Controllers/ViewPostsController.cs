@@ -43,6 +43,7 @@ namespace ServerMVCProject.Controllers
 
 
         [HttpPost("react")]
+        [AuthorizeUser]
         public JsonResult ReactAjax(long postId, string type)
         {
             try

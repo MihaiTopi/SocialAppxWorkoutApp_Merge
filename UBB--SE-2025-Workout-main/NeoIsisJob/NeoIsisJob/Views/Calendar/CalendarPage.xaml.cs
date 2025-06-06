@@ -1,22 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using NeoIsisJob.Proxy;
 // using NeoIsisJob.Data;
 // using NeoIsisJob.Models;
 using NeoIsisJob.ViewModels.Calendar;
 // using NeoIsisJob.Services;
 // using NeoIsisJob.Services.Interfaces;
 using Workout.Core.Models;
-using Workout.Core.Data;
-using NeoIsisJob.Proxy;
-using NeoIsisJob.Views.Shop.Pages;
-using NeoIsisJob.Views.Nutrition;
-using NeoIsisJob.Views.Statistics;
 namespace NeoIsisJob.Views
 {
     public sealed partial class CalendarPage : Page
@@ -32,7 +27,7 @@ namespace NeoIsisJob.Views
             calendarService = new CalendarServiceProxy();
 
             // Assuming you have a way to get the UserId, e.g., from app state or navigation
-            int userId = 1; // Replace with actual user ID source
+            int userId = AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1;
             ViewModel = new CalendarViewModel(userId);
             this.DataContext = ViewModel;
             Loaded += CalendarPage_Loaded;

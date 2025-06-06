@@ -6,9 +6,10 @@ using Workout.Core.Models;
 
 namespace NeoIsisJob.ViewModels.Shop
 {
-    using NeoIsisJob.Proxy;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
+    using NeoIsisJob.Proxy;
 
     /// <summary>
     /// ViewModel responsible for managing cart operations such as adding, retrieving, and removing cart items.
@@ -19,7 +20,7 @@ namespace NeoIsisJob.ViewModels.Shop
         /// Service used to interact with cart data.
         /// </summary>
         private readonly CartServiceProxy cartServiceProxy;
-        private readonly int userId = 1; // This should be replaced with the actual user ID from the session or authentication context.
+        private readonly int userId = AppController.CurrentUser != null ? AppController.CurrentUser.ID : 1; // This should be replaced with the actual user ID from the session or authentication context.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CartViewModel"/> class.
@@ -40,7 +41,8 @@ namespace NeoIsisJob.ViewModels.Shop
         /// <returns>A collection of <see cref="CartItem"/> objects.</returns>
         public async Task<IEnumerable<CartItemModel>> GetAllProductsFromCartAsync()
         {
-            IEnumerable<CartItemModel> cartItems = await this.cartServiceProxy.GetAllAsync();
+            IEnumerable<CartItemModel> cartItemsAll = await this.cartServiceProxy.GetAllAsync();
+            var cartItems = cartItemsAll.Where(item => item.UserID == userId);
             this.ComputeTotalPrice(cartItems);
             return cartItems;
         }

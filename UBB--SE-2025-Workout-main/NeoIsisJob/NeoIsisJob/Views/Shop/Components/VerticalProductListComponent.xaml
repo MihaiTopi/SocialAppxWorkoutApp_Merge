@@ -78,7 +78,7 @@
                                     <!-- Category -->
                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                         <SymbolIcon Symbol="Important" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-                                        <TextBlock Text="{x:Bind Category, Mode=OneWay}" 
+                                        <TextBlock Text="{x:Bind Description, Mode=OneWay}" 
                                                   FontSize="14"
                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                                     </StackPanel>
