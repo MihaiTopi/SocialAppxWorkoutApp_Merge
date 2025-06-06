@@ -8,9 +8,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="#f3f4f6">
 
-    <Grid x:Name="RootGrid" Background="#222831">
+    <Grid x:Name="RootGrid" Background="#f3f4f6">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -19,89 +19,74 @@
         <!-- Top Bar -->
         <components:TopBar Grid.Row="0" x:Name="TopBar"/>
 
-        <!-- Main Content -->
-        <Grid
-        Grid.Row="1">
-
+        <!-- Main Content Area -->
+        <Grid Grid.Row="1" Margin="40,20,40,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" MinWidth="150"/>
-                <ColumnDefinition MinWidth="800"/>
+                <ColumnDefinition Width="*" MinWidth="800"/>
                 <ColumnDefinition Width="Auto" MinWidth="150"/>
             </Grid.ColumnDefinitions>
 
-            <Grid
-                Grid.Column="1">
-
+            <!-- Center Content (Group Details and Posts Feed) -->
+            <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                
-                <!-- Details -->
-                <StackPanel
-                    VerticalAlignment="Top" 
-                    HorizontalAlignment="Center" 
-                    Background="#393E46" 
-                    Padding="20" 
-                    CornerRadius="10" 
-                    Margin="0,10,0,0"
-                    Width="800"
-                    Grid.Row="0">
-                    <Image
-                        x:Name="GroupImage"/>
-                    <TextBlock
-                        x:Name="GroupTitle"
-                        FontSize="24" 
-                        FontFamily="Segoe Script"
-                        Text="[TITLE]"/>
-                    <TextBlock
-                        x:Name="GroupDescription"
-                        Text="[DESCRIPTION]"/>
-                </StackPanel>
 
-                <!-- Feed-->
-                <components:PostsFeed
-                    x:Name="PostsFeed"
-                    Grid.Row="1"/>
-            </Grid>
-            
+                <!-- Group Details Card -->
+                <Border Grid.Row="0" Background="#fff" Padding="30" CornerRadius="16" Margin="0,0,0,20" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                    <StackPanel Spacing="12">
+                        <!-- Group Image (Assuming it's handled in code-behind to set Source) -->
+                        <Image x:Name="GroupImage" Height="150" Stretch="UniformToFill" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                        
+                        <TextBlock x:Name="GroupTitle" FontSize="28" FontWeight="Bold" Foreground="#222" Text="[TITLE]" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                        <TextBlock x:Name="GroupDescription" FontSize="16" Foreground="#444" Text="[DESCRIPTION]" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center"/>
+                    </StackPanel>
+                </Border>
 
-            <!-- Members Panel -->
-            <StackPanel
-                x:Name="MembersPanel"
-                Orientation="Vertical"
-                Background="#393E46"
-                Padding="10"
-                Margin="10 10 0 20 "
-                Width="300"
-                HorizontalAlignment="Center"
-                Grid.Column="0">
-
-                <TextBlock 
-                    Text="Members"/>
-                
-                <StackPanel x:Name="MembersList"/>
-            </StackPanel>
-
-            <!-- Create and Edit Buttons-->
-            <Grid
-                Grid.Column="2"
-                VerticalAlignment="Bottom">
-                <StackPanel
-                    Orientation="Vertical">
-                    <Button
-                        Margin="20,10,20,20"
-                        x:Name="CreatePostInGroupButton"
-                        Content="Create Post"
-                        Background="#D9D9D9"
-                        Foreground="Black"
-                        CornerRadius="5"
-                        Width="100"
-                        Click="CreatePostInGroupButton_Click"/>
-                </StackPanel>
+                <!-- Posts Feed -->
+                <!-- Assuming PostsFeed component is already styled -->
+                <components:PostsFeed x:Name="PostsFeed" Grid.Row="1" Margin="0"/>
             </Grid>
 
+            <!-- Members Panel Card (Left Column) -->
+            <Border Grid.Column="0" Background="#fff" Padding="20" CornerRadius="16" Margin="0,0,20,0" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="300">
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Members" FontSize="20" FontWeight="SemiBold" Foreground="#222" Margin="0,0,0,10"/>
+
+                    <!-- Members List (Using ItemsControl) -->
+                    <!-- You will need to bind your collection of members to the ItemsSource in the code-behind -->
+                    <ItemsControl x:Name="MembersItemsControl">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <!-- Template for each member item -->
+                                <Border Background="#f9fafb" CornerRadius="8" Padding="10" Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <!-- Member Image/Icon Placeholder -->
+                                        <Ellipse Width="30" Height="30" Fill="#ddd"/>
+                                        <!-- Bind to member name property -->
+                                        <TextBlock Text="{Binding MemberName}" VerticalAlignment="Center" FontSize="16" Foreground="#222"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Removed MembersList StackPanel - Replaced by ItemsControl -->
+
+                </StackPanel>
+            </Border>
+
+            <!-- Create and Edit Buttons (Right Column) -->
+            <!-- Wrapped buttons in a StackPanel within a Border for consistent styling -->
+            <Border Grid.Column="2" Background="#fff" Padding="20" CornerRadius="16" Margin="20,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Width="150">
+                <StackPanel Orientation="Vertical" Spacing="15" HorizontalAlignment="Stretch">
+                    <Button x:Name="CreatePostInGroupButton" Content="Create Post" Background="#2563eb" Foreground="White" CornerRadius="8" FontWeight="SemiBold" HorizontalAlignment="Stretch" Click="CreatePostInGroupButton_Click" Padding="10,12"/>
+                    <!-- Add Edit Group Button if needed -->
+                    <!-- <Button Content="Edit Group" Background="#f3f4f6" Foreground="#222" CornerRadius="8" FontWeight="SemiBold" HorizontalAlignment="Stretch" Click="EditGroupButton_Click" Padding="10,12"/> -->
+                </StackPanel>
+            </Border>
         </Grid>
-
     </Grid>
 </Page>

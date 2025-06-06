@@ -7,7 +7,8 @@ using Microsoft.UI.Xaml.Navigation;
 using NeoIsisJob;
 using Workout.Core.IServices;
 using Workout.Core.Models;
-
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace DesktopProject.Pages
 {
@@ -21,10 +22,14 @@ namespace DesktopProject.Pages
         private long GroupId;
         private Group group;
 
+        private ObservableCollection<UserModel> groupMembers = new();
+
         public GroupPage()
         {
             this.InitializeComponent();
             this.Loaded += DisplayPage;
+
+            MembersItemsControl.ItemsSource = groupMembers;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -68,17 +73,18 @@ namespace DesktopProject.Pages
 
         private void PopulateMembers()
         {
-            this.MembersList.Children.Clear();
+            groupMembers.Clear();
+
             List<UserModel> members = groupService.GetUsersFromGroup(GroupId);
             foreach (UserModel member in members)
             {
-                this.MembersList.Children.Add(new Member(member, this.Frame, GroupId));
+                groupMembers.Add(member);
             }
         }
 
         private void CreatePostInGroupButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(CreatePost));
+            Frame.Navigate(typeof(CreatePost), GroupId);
         }
     }
 }
