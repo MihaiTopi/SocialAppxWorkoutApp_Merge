@@ -9,6 +9,7 @@ using NeoIsisJob.Proxy;
 using NeoIsisJob.ViewModels;
 using NeoIsisJob.ViewModels.Rankings;
 using NeoIsisJob.ViewModels.Workout;
+using Workout.Core.IServices;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -85,10 +86,11 @@ namespace NeoIsisJob
             serviceCollection.AddScoped<WishlistServiceProxy>();
             serviceCollection.AddScoped<OrderServiceProxy>();
             serviceCollection.AddScoped<CalendarServiceProxy>();
-            serviceCollection.AddScoped<PostServiceProxy>();
-            serviceCollection.AddScoped<CommentServiceProxy>();
-            serviceCollection.AddScoped<GroupServiceProxy>();
-            serviceCollection.AddScoped<ReactionServiceProxy>();
+            serviceCollection.AddScoped<IPostService,PostServiceProxy>();
+            serviceCollection.AddScoped<ICommentService,CommentServiceProxy>();
+            serviceCollection.AddScoped<IGroupService,GroupServiceProxy>();
+            serviceCollection.AddScoped<IReactionService,ReactionServiceProxy>();
+
 
             // Configure ApiSettings options
             /*serviceCollection.Configure<ApiSettings>(options =>

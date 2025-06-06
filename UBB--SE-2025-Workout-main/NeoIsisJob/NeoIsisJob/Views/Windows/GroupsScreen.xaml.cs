@@ -24,7 +24,6 @@ namespace DesktopProject.Windows
 
         private void SetNavigation()
         {
-            TopBar.HomeButtonInstance.Click += HomeClick;
             TopBar.UserButtonInstance.Click += UserClick;
             TopBar.GroupsButtonInstance.Click += GroupsClick;
         }

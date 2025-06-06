@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using DesktopProject;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using NeoIsisJob.Proxy;
@@ -330,6 +331,13 @@ namespace NeoIsisJob.Views
             mainPageContent.Visibility = Visibility.Collapsed;
             contentFrame.Visibility = Visibility.Visible;
             contentFrame.Navigate(typeof(LoginPage));
+        }
+
+        public void GoToSocialPage_Tap(object sender, RoutedEventArgs e)
+        {
+            mainPageContent.Visibility = Visibility.Collapsed;
+            contentFrame.Visibility = Visibility.Visible;
+            contentFrame.Navigate(typeof(HomeScreen));
         }
     }
 }
