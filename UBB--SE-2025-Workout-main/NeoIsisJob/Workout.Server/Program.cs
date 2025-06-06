@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using ServerLibraryProject.Interfaces;
@@ -139,5 +140,27 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Auto-open Swagger UI in browser when running from terminal (Windows)
+if (app.Environment.IsDevelopment())
+{
+    _ = Task.Run(() =>
+    {
+        // Wait a moment for the server to start
+        Thread.Sleep(2000);
+
+        try
+        {
+            var url = "http://localhost:5261/swagger";
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Could not automatically open browser: {ex.Message}");
+            Console.WriteLine("You can manually navigate to: http://localhost:5261/swagger");
+        }
+    });
+}
+
 
 app.Run();

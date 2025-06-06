@@ -17,7 +17,15 @@ namespace NeoIsisJob
             Instance = this;
             AppMainFrame = this.MainFrame;
 
-            // go directly to the main page
+            // Set window size - add 100px to default height
+            var appWindow = this.AppWindow;
+            if (appWindow != null)
+            {
+                // Set initial window size (width: 1200 + 100 = 1300, height: 800 + 100 = 900)
+                appWindow.Resize(new Windows.Graphics.SizeInt32(1450, 900));
+            }
+
+            // go directly to the login page
             MainFrame.Navigate(typeof(LoginPage));
         }
     }

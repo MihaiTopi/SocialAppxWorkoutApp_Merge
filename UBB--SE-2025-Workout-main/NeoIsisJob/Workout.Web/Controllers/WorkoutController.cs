@@ -1,10 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Workout.Web.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Workout.Web.Filters;
+using Workout.Web.Models;
 
 namespace Workout.Web.Controllers
 {
@@ -21,8 +20,9 @@ namespace Workout.Web.Controllers
             _clientFactory = clientFactory;
             _logger = logger;
             _configuration = configuration;
-            
-            var baseUrl = _configuration["ApiSettings:BaseUrl"] ?? "http://172.30.241.79:5261";
+
+            //var baseUrl = _configuration["ApiSettings:BaseUrl"] ?? "http://172.30.241.79:5261";
+            var baseUrl = "http://localhost:5261";
             apiUrl = $"{baseUrl}/api/Workout";
             workoutTypeApiUrl = $"{baseUrl}/api/WorkoutType";
         }
@@ -31,7 +31,7 @@ namespace Workout.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var client = _clientFactory.CreateClient();
-            
+
             try
             {
                 var response = await client.GetAsync(apiUrl);
@@ -41,7 +41,7 @@ namespace Workout.Web.Controllers
                     var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                     var content = await response.Content.ReadAsStringAsync();
                     var workouts = JsonSerializer.Deserialize<List<WorkoutModel>>(content, options);
-                    
+
                     // Get workout types for display
                     try
                     {
@@ -50,7 +50,7 @@ namespace Workout.Web.Controllers
                         {
                             var typesContent = await workoutTypesResponse.Content.ReadAsStringAsync();
                             var workoutTypes = JsonSerializer.Deserialize<List<WorkoutTypeModel>>(typesContent, options);
-                            
+
                             // Populate workout type names
                             foreach (var workout in workouts)
                             {
@@ -60,7 +60,7 @@ namespace Workout.Web.Controllers
                                     workout.WorkoutTypeName = workoutType.Name;
                                 }
                             }
-                            
+
                             ViewBag.WorkoutTypes = workoutTypes;
                         }
                     }
@@ -68,7 +68,7 @@ namespace Workout.Web.Controllers
                     {
                         _logger.LogError($"Error fetching workout types: {ex.Message}");
                     }
-                    
+
                     return View(workouts);
                 }
                 else
@@ -97,7 +97,7 @@ namespace Workout.Web.Controllers
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var content = await response.Content.ReadAsStringAsync();
                 var workout = JsonSerializer.Deserialize<WorkoutModel>(content, options);
-                
+
                 // Get workout type name
                 var workoutTypeResponse = await client.GetAsync($"{workoutTypeApiUrl}/{workout.WorkoutTypeId}");
                 if (workoutTypeResponse.IsSuccessStatusCode)
@@ -106,7 +106,7 @@ namespace Workout.Web.Controllers
                     var workoutType = JsonSerializer.Deserialize<WorkoutTypeModel>(typeContent, options);
                     workout.WorkoutTypeName = workoutType.Name;
                 }
-                
+
                 return View(workout);
             }
             else
@@ -124,13 +124,13 @@ namespace Workout.Web.Controllers
             {
                 var client = _clientFactory.CreateClient();
                 var response = await client.GetAsync(workoutTypeApiUrl);
-                
+
                 if (response.IsSuccessStatusCode)
                 {
                     var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                     var content = await response.Content.ReadAsStringAsync();
                     var workoutTypes = JsonSerializer.Deserialize<List<WorkoutTypeModel>>(content, options);
-                    
+
                     ViewBag.WorkoutTypes = new SelectList(workoutTypes, "Id", "Name");
                 }
                 else
@@ -138,7 +138,7 @@ namespace Workout.Web.Controllers
                     _logger.LogError($"Error fetching workout types: {response.StatusCode}");
                     ViewBag.ErrorMessage = "Could not load workout types. Please make sure the API server is running.";
                 }
-                
+
                 return View();
             }
             catch (Exception ex)
@@ -160,7 +160,7 @@ namespace Workout.Web.Controllers
                 try
                 {
                     var client = _clientFactory.CreateClient();
-                    
+
                     // First, get available workout types to verify the selected ID is valid
                     var availableWorkoutTypes = new List<WorkoutTypeModel>();
                     try
@@ -171,7 +171,7 @@ namespace Workout.Web.Controllers
                             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                             var typesContent = await typesResponse.Content.ReadAsStringAsync();
                             availableWorkoutTypes = JsonSerializer.Deserialize<List<WorkoutTypeModel>>(typesContent, options);
-                            
+
                             _logger.LogInformation($"Available workout types: {JsonSerializer.Serialize(availableWorkoutTypes.Select(wt => new { wt.Id, wt.Name }))}");
                         }
                     }
@@ -179,7 +179,7 @@ namespace Workout.Web.Controllers
                     {
                         _logger.LogError($"Error fetching workout types: {ex.Message}");
                     }
-                    
+
                     // Check if the selected workout type exists in available types
                     var selectedWorkoutType = availableWorkoutTypes.FirstOrDefault(wt => wt.Id == workout.WorkoutTypeId);
                     if (selectedWorkoutType == null && availableWorkoutTypes.Any())
@@ -201,43 +201,43 @@ namespace Workout.Web.Controllers
                         await LoadWorkoutTypes();
                         return View(workout);
                     }
-                    
+
                     if (string.IsNullOrEmpty(workout.Description))
                     {
                         workout.Description = "Default description";
                     }
-                    
+
                     // Approach 1: Try using direct URL method (simplest, no body content)
                     string directUrl = $"{apiUrl}/{Uri.EscapeDataString(workout.Name)}/{workout.WorkoutTypeId}";
                     _logger.LogInformation($"Trying URL endpoint: {directUrl}");
-                    
+
                     var response = await client.PostAsync(directUrl, null);
-                    
+
                     if (response.IsSuccessStatusCode)
                     {
                         _logger.LogInformation("Successfully created workout using URL endpoint");
                         return RedirectToAction(nameof(Index));
                     }
-                    
+
                     // Approach 2: Try with minimal payload focusing on just essential fields
                     var minimalPayload = new
                     {
                         Name = workout.Name,
                         WTID = workout.WorkoutTypeId
                     };
-                    
+
                     var minimalJson = JsonSerializer.Serialize(minimalPayload);
                     _logger.LogInformation($"Trying minimal JSON: {minimalJson}");
-                    
+
                     var minimalContent = new StringContent(minimalJson, Encoding.UTF8, "application/json");
                     var minimalResponse = await client.PostAsync(apiUrl, minimalContent);
-                    
+
                     if (minimalResponse.IsSuccessStatusCode)
                     {
                         _logger.LogInformation("Successfully created workout using minimal JSON");
                         return RedirectToAction(nameof(Index));
                     }
-                    
+
                     // Approach 3: Try with the exact structure from the DB
                     var exactPayload = new
                     {
@@ -245,44 +245,44 @@ namespace Workout.Web.Controllers
                         WTID = workout.WorkoutTypeId,
                         Description = workout.Description,
                     };
-                    
+
                     var exactJson = JsonSerializer.Serialize(exactPayload);
                     _logger.LogInformation($"Trying exact DB structure JSON: {exactJson}");
-                    
+
                     var exactContent = new StringContent(exactJson, Encoding.UTF8, "application/json");
                     var exactResponse = await client.PostAsync(apiUrl, exactContent);
-                    
+
                     if (exactResponse.IsSuccessStatusCode)
                     {
                         _logger.LogInformation("Successfully created workout using exact DB structure");
                         return RedirectToAction(nameof(Index));
                     }
-                    
+
                     // Approach 4: Try with complete structure including WorkoutType
                     var completePayload = new
                     {
                         Name = workout.Name,
                         WTID = workout.WorkoutTypeId,
                         Description = workout.Description,
-                        WorkoutType = new 
+                        WorkoutType = new
                         {
                             WTID = workout.WorkoutTypeId,
                             Name = workout.WorkoutType.Name
                         }
                     };
-                    
+
                     var completeJson = JsonSerializer.Serialize(completePayload);
                     _logger.LogInformation($"Trying complete structure JSON: {completeJson}");
-                    
+
                     var completeContent = new StringContent(completeJson, Encoding.UTF8, "application/json");
                     var completeResponse = await client.PostAsync(apiUrl, completeContent);
-                    
+
                     if (completeResponse.IsSuccessStatusCode)
                     {
                         _logger.LogInformation("Successfully created workout using complete structure");
                         return RedirectToAction(nameof(Index));
                     }
-                    
+
                     // Final approach: Try with original Core model structure exactly
                     var coreModelPayload = new Dictionary<string, object>
                     {
@@ -295,33 +295,33 @@ namespace Workout.Web.Controllers
                             ["Name"] = workout.WorkoutType.Name ?? "Default Type"
                         }
                     };
-                    
+
                     var coreModelJson = JsonSerializer.Serialize(coreModelPayload);
                     _logger.LogInformation($"Trying core model structure JSON: {coreModelJson}");
-                    
+
                     var coreModelContent = new StringContent(coreModelJson, Encoding.UTF8, "application/json");
                     var coreModelResponse = await client.PostAsync(apiUrl, coreModelContent);
-                    
+
                     if (coreModelResponse.IsSuccessStatusCode)
                     {
                         _logger.LogInformation("Successfully created workout using core model structure");
                         return RedirectToAction(nameof(Index));
                     }
-                    
+
                     // Log all failed attempts
                     var errorResponseContent = await response.Content.ReadAsStringAsync();
                     var minimalErrorContent = await minimalResponse.Content.ReadAsStringAsync();
                     var exactErrorContent = await exactResponse.Content.ReadAsStringAsync();
                     var completeErrorContent = await completeResponse.Content.ReadAsStringAsync();
                     var coreModelErrorContent = await coreModelResponse.Content.ReadAsStringAsync();
-                    
+
                     _logger.LogError($"All approaches failed:\n" +
                         $"URL approach: {response.StatusCode}, {errorResponseContent}\n" +
                         $"Minimal JSON: {minimalResponse.StatusCode}, {minimalErrorContent}\n" +
                         $"Exact JSON: {exactResponse.StatusCode}, {exactErrorContent}\n" +
                         $"Complete JSON: {completeResponse.StatusCode}, {completeErrorContent}\n" +
                         $"Core Model JSON: {coreModelResponse.StatusCode}, {coreModelErrorContent}");
-                    
+
                     ViewBag.ErrorMessage = $"Could not create workout. Status codes: URL={response.StatusCode}, Minimal={minimalResponse.StatusCode}, Exact={exactResponse.StatusCode}, Complete={completeResponse.StatusCode}, CoreModel={coreModelResponse.StatusCode}";
                     ViewBag.RequestContent = $"URL: {directUrl}\nMinimal: {minimalJson}\nExact: {exactJson}\nComplete: {completeJson}\nCoreModel: {coreModelJson}";
                 }
@@ -342,12 +342,12 @@ namespace Workout.Web.Controllers
                     }
                 }
             }
-            
+
             // If we got this far, something failed, reload workout types and redisplay form
             await LoadWorkoutTypes();
             return View(workout);
         }
-        
+
         // Helper method to load workout types into ViewBag
         private async Task LoadWorkoutTypes()
         {
@@ -381,7 +381,7 @@ namespace Workout.Web.Controllers
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var content = await response.Content.ReadAsStringAsync();
                 var workout = JsonSerializer.Deserialize<WorkoutModel>(content, options);
-                
+
                 // Get workout types for dropdown
                 var workoutTypesResponse = await client.GetAsync(workoutTypeApiUrl);
                 if (workoutTypesResponse.IsSuccessStatusCode)
@@ -390,7 +390,7 @@ namespace Workout.Web.Controllers
                     var workoutTypes = JsonSerializer.Deserialize<List<WorkoutTypeModel>>(typesContent, options);
                     ViewBag.WorkoutTypes = new SelectList(workoutTypes, "Id", "Name", workout.WorkoutTypeId);
                 }
-                
+
                 return View(workout);
             }
             else
@@ -416,7 +416,7 @@ namespace Workout.Web.Controllers
                 try
                 {
                     var client = _clientFactory.CreateClient();
-                    
+
                     // First, get all available workout types
                     var workoutTypes = await GetWorkoutTypesAsync();
                     if (!workoutTypes.Any())
@@ -425,12 +425,12 @@ namespace Workout.Web.Controllers
                         await LoadWorkoutTypes();
                         return View(workout);
                     }
-                    
+
                     // Verify the selected workout type exists
                     int workoutTypeId = workout.WorkoutTypeId;
                     string workoutTypeName = null;
                     var selectedType = workoutTypes.FirstOrDefault(wt => wt.Id == workoutTypeId);
-                    
+
                     if (selectedType != null)
                     {
                         // If found, use it
@@ -446,18 +446,18 @@ namespace Workout.Web.Controllers
                         workoutTypeName = firstType.Name;
                         _logger.LogWarning($"Selected workout type ID {workout.WorkoutTypeId} not found, using first available: ID={workoutTypeId}, Name={workoutTypeName}");
                     }
-                    
+
                     // Use the delete-recreate approach which is known to work
                     _logger.LogInformation($"Attempting to delete workout with ID {id}");
                     var deleteResponse = await client.DeleteAsync($"{apiUrl}/{id}");
-                    
+
                     if (deleteResponse.IsSuccessStatusCode)
                     {
                         // Then recreate with the new data using the simple URL approach
                         _logger.LogInformation($"Recreating workout with name '{workout.Name}' and verified type ID {workoutTypeId}");
                         string createUrl = $"{apiUrl}/{Uri.EscapeDataString(workout.Name)}/{workoutTypeId}";
                         var createResponse = await client.PostAsync(createUrl, null);
-                        
+
                         if (createResponse.IsSuccessStatusCode)
                         {
                             _logger.LogInformation("Successfully updated workout by recreating it");
@@ -494,26 +494,26 @@ namespace Workout.Web.Controllers
                     }
                 }
             }
-            
+
             // If we got this far, something failed, redisplay form
             await LoadWorkoutTypes();
             ViewBag.WorkoutTypes = new SelectList(await GetWorkoutTypesAsync(), "Id", "Name", workout.WorkoutTypeId);
             return View(workout);
         }
-        
+
         // Helper method to get workout types
         private async Task<List<WorkoutTypeModel>> GetWorkoutTypesAsync()
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetAsync(workoutTypeApiUrl);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var content = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<List<WorkoutTypeModel>>(content, options);
             }
-            
+
             return new List<WorkoutTypeModel>();
         }
 
@@ -529,7 +529,7 @@ namespace Workout.Web.Controllers
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var content = await response.Content.ReadAsStringAsync();
                 var workout = JsonSerializer.Deserialize<WorkoutModel>(content, options);
-                
+
                 // Get workout type name
                 var workoutTypeResponse = await client.GetAsync($"{workoutTypeApiUrl}/{workout.WorkoutTypeId}");
                 if (workoutTypeResponse.IsSuccessStatusCode)
@@ -538,7 +538,7 @@ namespace Workout.Web.Controllers
                     var workoutType = JsonSerializer.Deserialize<WorkoutTypeModel>(typeContent, options);
                     workout.WorkoutTypeName = workoutType.Name;
                 }
-                
+
                 return View(workout);
             }
             else
@@ -567,7 +567,7 @@ namespace Workout.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
-        
+
         // GET: Workout/Types
         public async Task<IActionResult> Types()
         {
@@ -600,7 +600,7 @@ namespace Workout.Web.Controllers
             try
             {
                 var client = _clientFactory.CreateClient();
-                
+
                 // First, get all available workout types from the API
                 var workoutTypes = await GetWorkoutTypesAsync();
                 if (!workoutTypes.Any())
@@ -608,7 +608,7 @@ namespace Workout.Web.Controllers
                     _logger.LogError("No workout types available");
                     return StatusCode(500, "No workout types available in the system");
                 }
-                
+
                 // Get the existing workout data
                 var response = await client.GetAsync($"{apiUrl}/{id}");
 
@@ -618,7 +618,7 @@ namespace Workout.Web.Controllers
                     var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                     var content = await response.Content.ReadAsStringAsync();
                     var workout = JsonSerializer.Deserialize<WorkoutModel>(content, options);
-                    
+
                     // Get workout type ID and verify it exists in the database
                     int workoutTypeId = workout.WTID;
                     if (!workoutTypes.Any(wt => wt.WTID == workoutTypeId))
@@ -627,18 +627,18 @@ namespace Workout.Web.Controllers
                         _logger.LogWarning($"Workout type ID {workoutTypeId} doesn't exist, using the first available type");
                         workoutTypeId = workoutTypes.First().WTID;
                     }
-                    
+
                     // First delete the workout
                     _logger.LogInformation($"Attempting to delete workout with ID {id}");
                     var deleteResponse = await client.DeleteAsync($"{apiUrl}/{id}");
-                    
+
                     if (deleteResponse.IsSuccessStatusCode)
                     {
                         // Then recreate with the new name using the simple URL approach
                         _logger.LogInformation($"Recreating workout with name '{name}' and verified type ID {workoutTypeId}");
                         string createUrl = $"{apiUrl}/{Uri.EscapeDataString(name)}/{workoutTypeId}";
                         var createResponse = await client.PostAsync(createUrl, null);
-                        
+
                         if (createResponse.IsSuccessStatusCode)
                         {
                             _logger.LogInformation("Successfully updated workout name by recreating it");
@@ -676,7 +676,7 @@ namespace Workout.Web.Controllers
         public async Task<IActionResult> GetAll()
         {
             var client = _clientFactory.CreateClient();
-            
+
             try
             {
                 var response = await client.GetAsync(apiUrl);
@@ -701,4 +701,4 @@ namespace Workout.Web.Controllers
             }
         }
     }
-} 
+}
