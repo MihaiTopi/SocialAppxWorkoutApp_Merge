@@ -1,0 +1,8 @@
+﻿[build]
+builder = "dockfile"
+dockfilePath = "./Workout.Web/Dockerfile"
+
+[deploy]
+startCommand = "dotnet Workout.Web.dll"
+restartPolicyType = "always"
+healthCheckPath = "/health""

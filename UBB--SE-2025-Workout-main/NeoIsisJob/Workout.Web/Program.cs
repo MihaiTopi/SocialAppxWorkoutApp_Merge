@@ -14,6 +14,11 @@ using Workout.Web.Data;
 // Allow top-level statements to use await
 var builder = WebApplication.CreateBuilder(args);
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080"; // for railway
+builder.WebHost.UseUrls($"http://*:{port}");
+
+builder.Services.AddHealthChecks();
+
 // Add services to the container.
 //var connectionString = "Server=(localdb)\\mssqllocaldb;Database=Workout;Trusted_Connection=True;MultipleActiveResultSets=true";
 //var connectionString = "Server=localhost\\SQLEXPRESS;Database=Workout;Trusted_Connection=True;MultipleActiveResultSets=true";
@@ -163,8 +168,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080"; // fo railway
-app.Urls.Add($"http://*:{port}");
-
+app.UseHealthChecks("/health");
 
 app.Run();
