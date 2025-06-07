@@ -1,20 +1,10 @@
-@model List<Post>
-@using Workout.Core.IRepositories
-@using Workout.Core.IServices
-@using Workout.Core.Models
+@model List<PostViewModel>
 @using Workout.Core.Enums
-@inject IReactionRepository ReactionRepository
-@inject ICommentService CommentService
-@inject IUserRepo UserRepository
+@using Workout.Web.ViewModels.PostViewModels
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = "All Posts";
-
-    int page = Context.Request.Query["page"].Count > 0 ? int.Parse(Context.Request.Query["page"]) : 1;
-    int pageSize = 6;
-    var pagedPosts = Model.OrderByDescending(p => p.Id).Skip((page - 1) * pageSize).Take(pageSize).ToList();
-    int totalPages = (int)Math.Ceiling(Model.Count / (double)pageSize);
 
     string? userIdString = HttpContextAccessor.HttpContext?.Session.GetString("UserId");
     int.TryParse(userIdString, out int userId);
@@ -22,7 +12,7 @@
 
 @Html.AntiForgeryToken()
 
-<!-- Modern Top Bar -->
+<!-- Top Bar -->
 <div style="
     display: flex;
     align-items: center;
@@ -51,14 +41,18 @@
            transition: background 0.2s;
        "
        onmouseover="this.style.background='#1d4ed8'"
-       onmouseout="this.style.background='#2563eb'"
-    >+ Create Post</a>
+       onmouseout="this.style.background='#2563eb'">+ Create Post</a>
 </div>
 
 <div style="display: flex; justify-content: center; margin-top: 30px;">
     <div style="width: 600px;">
-        @foreach (var post in pagedPosts)
+        @foreach (var postVm in Model)
         {
+            var post = postVm.Post;
+            var author = postVm.Author;
+            var reactions = postVm.Reactions;
+            var comments = postVm.Comments;
+
             var tagColor = post.Tag switch
             {
                 PostTag.Food => "#FFA500",
@@ -66,98 +60,103 @@
                 _ => "#393e46"
             };
 
-            var reactions = await ReactionRepository.GetReactionsByPostId(post.Id);
             int likeCount = reactions.Count(r => r.Type == ReactionType.Like);
             int loveCount = reactions.Count(r => r.Type == ReactionType.Love);
             int laughCount = reactions.Count(r => r.Type == ReactionType.Laugh);
             int angerCount = reactions.Count(r => r.Type == ReactionType.Anger);
-            var userReaction = await ReactionRepository.GetReaction(userId, post.Id);
 
-            var comments = await CommentService.GetCommentsByPostId(post.Id);
-            var postAuthor = await UserRepository.GetUserByIdAsync(post.UserId);
-        <div style="background-color: @tagColor; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; color: black; position: relative;">
-            <div style="display: flex; justify-content: space-between;">
-                <h4>@postAuthor.Username</h4>
-                <span style="background-color: white; padding: 2px 10px; border-radius: 12px;">@post.Visibility</span>
-            </div>
+            var userReaction = reactions.FirstOrDefault(r => r.UserId == userId)?.Type;
 
-            <p style="margin: 10px 0; background-color: #f5f5f5; padding: 10px; border-radius: 6px;">@post.Content</p>
+            <div style="background-color: @tagColor; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; color: black; position: relative;">
+                <div style="display: flex; justify-content: space-between;">
+                    <h4>@author.Username</h4>
+                    <span style="background-color: white; padding: 2px 10px; border-radius: 12px;">@post.Visibility</span>
+                </div>
 
-            <!-- Reactions -->
-            <div style="display: flex; gap: 15px; align-items: center;">
-                @foreach (var type in Enum.GetValues(typeof(ReactionType)).Cast<ReactionType>())
-                {
-                    var count = type switch
+                <p style="margin: 10px 0; background-color: #f5f5f5; padding: 10px; border-radius: 6px;">@post.Content</p>
+
+                <!-- Reactions -->
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    @foreach (var type in Enum.GetValues(typeof(ReactionType)).Cast<ReactionType>())
                     {
-                        ReactionType.Like => likeCount,
-                        ReactionType.Love => loveCount,
-                        ReactionType.Laugh => laughCount,
-                        ReactionType.Anger => angerCount,
-                        _ => 0
-                    };
-                    var emoji = type switch
-                    {
-                        ReactionType.Like => "👍",
-                        ReactionType.Love => "❤️",
-                        ReactionType.Laugh => "😂",
-                        ReactionType.Anger => "😡",
-                        _ => ""
-                    };
-                    <button class="react-btn"
-                            data-post="@post.Id"
-                            data-type="@type"
-                            style="background: none; border: none; cursor: pointer;@(userReaction?.Type == type ? " font-weight: bold;" : "")">
-                        @emoji <span id="@type.ToString().ToLower()-@post.Id">@count</span>
+                        var count = type switch
+                        {
+                            ReactionType.Like => likeCount,
+                            ReactionType.Love => loveCount,
+                            ReactionType.Laugh => laughCount,
+                            ReactionType.Anger => angerCount,
+                            _ => 0
+                        };
+                        var emoji = type switch
+                        {
+                            ReactionType.Like => "👍",
+                            ReactionType.Love => "❤️",
+                            ReactionType.Laugh => "😂",
+                            ReactionType.Anger => "😡",
+                            _ => ""
+                        };
+
+                        <button class="react-btn"
+                                data-post="@post.Id"
+                                data-type="@type"
+                                style="background: none; border: none; cursor: pointer;@(userReaction == type ? " font-weight: bold;" : "")">
+                            @emoji <span id="@type.ToString().ToLower()-@post.Id">@count</span>
+                        </button>
+                    }
+
+                    <!-- Toggle Comments -->
+                    <button type="button"
+                            onclick="toggleComments('comments-@post.Id')"
+                            style="background: none; border: none; cursor: pointer; margin-left: auto;">
+                        💬 <span>@comments.Count</span>
                     </button>
-                }
+                </div>
 
-                <!-- Toggle Comments -->
-                <button type="button"
-                        onclick="toggleComments('comments-@post.Id')"
-                        style="background: none; border: none; cursor: pointer; margin-left: auto;">
-                    💬 <span>@comments.Count</span>
-                </button>
-            </div>
+                <div style="margin-top: 10px; font-size: 0.8em;">
+                    <span>@($"{(DateTime.UtcNow - post.CreatedDate).Days} days ago")</span>
+                </div>
 
-            <div style="margin-top: 10px; font-size: 0.8em;">
-                <span>@($"{(DateTime.UtcNow - post.CreatedDate).Days} days ago")</span>
-            </div>
-
-            <!-- Comments Section -->
-            <div id="comments-@post.Id" class="comments-dropdown" style="display: none; margin-top: 15px;">
-                <div style="background-color: white; border-radius: 8px; padding: 10px;">
-                    <div style="max-height: 200px; overflow-y: auto;">
-                        @if (comments.Any())
-                        {
-                            foreach (var comment in comments)
+                <!-- Comments Section -->
+                <div id="comments-@post.Id" class="comments-dropdown" style="display: none; margin-top: 15px;">
+                    <div style="background-color: white; border-radius: 8px; padding: 10px;">
+                        <div style="max-height: 200px; overflow-y: auto;">
+                            @if (comments.Any())
                             {
-                                var commentAuthor = await UserRepository.GetUserByIdAsync(comment.UserId);
-                                <div style="padding: 8px; border-bottom: 1px solid #eee;">
-                                    <strong>@commentAuthor.Username</strong><br />
-                                    <span>@comment.Content</span><br />
-                                    <small style="color: #777;">@comment.CreatedDate.ToString("MMM dd, yyyy hh:mm tt")</small>
-                                </div>
-                            }
-                        }
-                        else
-                        {
-                            <div style="text-align: center; color: #777;">No comments yet</div>
-                        }
-                    </div>
+                                foreach (var commentVm in comments)
+                                {
+                                    var comment = commentVm.Comment;
+                                    var commentAuthor = commentVm.Author;
 
-                    <!-- Add Comment Form -->
-                    <form action="/comments/create" method="post" class="comment-form">
-                        <input type="hidden" name="PostId" value="@post.Id" />
-                        <input type="text" name="Content" placeholder="Add a comment..." required style="width: 80%; margin-right: 5px;" />
-                        <button type="submit" style="background-color: #00ADB5; color: white;">Post</button>
-                    </form>
+                                    <div style="padding: 8px; border-bottom: 1px solid #eee;">
+                                        <strong>@commentAuthor.Username</strong><br />
+                                        <span>@comment.Content</span><br />
+                                        <small style="color: #777;">@comment.CreatedDate.ToString("MMM dd, yyyy hh:mm tt")</small>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div style="text-align: center; color: #777;">No comments yet</div>
+                            }
+                        </div>
+
+                        <!-- Add Comment Form -->
+                        <form action="/comments/create" method="post" class="comment-form">
+                            <input type="hidden" name="PostId" value="@post.Id" />
+                            <input type="text" name="Content" placeholder="Add a comment..." required style="width: 80%; margin-right: 5px;" />
+                            <button type="submit" style="background-color: #00ADB5; color: white;">Post</button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
         }
 
-        <!-- Pagination -->
+        <!-- Pagination (assumes ViewData["Page"], ViewData["TotalPages"] set) -->
         <div style="text-align: center; margin-top: 20px;">
+            @{
+                int page = (int)(ViewData["Page"] ?? 1);
+                int totalPages = (int)(ViewData["TotalPages"] ?? 1);
+            }
             @if (page > 1)
             {
                 <a class="btn btn-secondary" href="?page=@(page - 1)">Previous</a>
@@ -206,7 +205,5 @@
                 });
             });
         });
-
-        // Comment form AJAX submission could be added here if needed
     </script>
 }

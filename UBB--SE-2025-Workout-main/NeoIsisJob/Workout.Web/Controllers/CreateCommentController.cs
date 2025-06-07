@@ -24,12 +24,12 @@
 
         [Route("create")]
         [HttpGet]
-        public IActionResult Create(long postId)
+        public async Task<IActionResult> Create(long postId)
         {
             _logger.LogInformation($"Opening create comment form for post ID: {postId}");
 
             // Validate that the post exists
-            if (postId <= 0 || _postService.GetPostById(postId) == null)
+            if (postId <= 0 || await _postService.GetPostById(postId) == null)
             {
                 return BadRequest($"Invalid or non-existent post ID: {postId}");
             }
@@ -44,14 +44,14 @@
         [Route("create")]
         [AuthorizeUser]
         [HttpPost]
-        public IActionResult Create(CreateCommentViewModel model)
+        public async Task<IActionResult> Create(CreateCommentViewModel model)
         {
             try
             {
                 _logger.LogInformation($"Attempting to create comment for post ID: {model.PostId}");
 
                 // Ensure the PostId is valid
-                if (model.PostId <= 0 || _postService.GetPostById(model.PostId) == null)
+                if (model.PostId <= 0 || await _postService.GetPostById(model.PostId) == null)
                 {
                     ModelState.AddModelError(string.Empty, $"Invalid or non-existent post ID: {model.PostId}");
                     return View(model);
@@ -77,7 +77,7 @@
                 }
 
                 // Use the service directly
-                var comment = _commentService.AddComment(model.Content, userId, model.PostId);
+                var comment = await _commentService.AddComment(model.Content, userId, model.PostId);
 
                 _logger.LogInformation($"Comment created successfully with ID: {comment.Id}");
 
