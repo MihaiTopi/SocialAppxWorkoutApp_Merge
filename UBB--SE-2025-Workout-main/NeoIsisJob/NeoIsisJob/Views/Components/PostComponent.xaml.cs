@@ -2,6 +2,7 @@ namespace DesktopProject.Components
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.UI;
     using Microsoft.UI.Xaml;
@@ -96,10 +97,15 @@ namespace DesktopProject.Components
             }
 
             this.SetContent(); // Set text or image
-            this.LoadReactionCounts();
+            this.Loaded += this.LoadReactionCounts_async;
         }
 
-        private async void SetContent()
+        public async void LoadReactionCounts_async(object sender, RoutedEventArgs e)
+        {
+            await this.LoadReactionCounts();
+        }
+
+        private void SetContent()
         {
             const string imagePrefix = "image://";
             if (this.content.StartsWith(imagePrefix))
@@ -116,60 +122,60 @@ namespace DesktopProject.Components
             }
         }
 
-        private void LoadReactionCounts()
+        private async Task LoadReactionCounts()
         {
-            var reactions = this.reactionService.GetReactionsByPostId(this.postId);
+            var reactions = await this.reactionService.GetReactionsByPostId(this.postId);
             this.LikeCount.Text = reactions.Count(r => r.Type == ReactionType.Like).ToString();
             this.LoveCount.Text = reactions.Count(r => r.Type == ReactionType.Love).ToString();
             this.LaughCount.Text = reactions.Count(r => r.Type == ReactionType.Laugh).ToString();
             this.AngryCount.Text = reactions.Count(r => r.Type == ReactionType.Anger).ToString();
         }
 
-        private void LoadComments()
+        private async Task LoadComments()
         {
-            var comments = this.commentService.GetCommentsByPostId(this.postId);
-            CommentsListView.ItemsSource = comments;
+            var comments = await this.commentService.GetCommentsByPostId(this.postId);
+            this.CommentsListView.ItemsSource = comments;
         }
 
-        private void OnLikeButtonClick(object sender, RoutedEventArgs e)
+        private async void OnLikeButtonClick(object sender, RoutedEventArgs e)
         {
             if (AppController.CurrentUser != null)
             {
-                this.reactionService.AddReaction(new Reaction { UserId = AppController.CurrentUser.ID, PostId = postId, Type = ReactionType.Like });
-                this.LoadReactionCounts();
+                await this.reactionService.AddReaction(new Reaction { UserId = AppController.CurrentUser.ID, PostId = this.postId, Type = ReactionType.Like });
+                await this.LoadReactionCounts();
             }
         }
 
-        private void OnLoveButtonClick(object sender, RoutedEventArgs e)
+        private async void OnLoveButtonClick(object sender, RoutedEventArgs e)
         {
             if (AppController.CurrentUser != null)
             {
-                this.reactionService.AddReaction(new Reaction { UserId = AppController.CurrentUser.ID, PostId = postId, Type = ReactionType.Love });
-                this.LoadReactionCounts();
+                await this.reactionService.AddReaction(new Reaction { UserId = AppController.CurrentUser.ID, PostId = this.postId, Type = ReactionType.Love });
+                await this.LoadReactionCounts();
             }
         }
 
-        private void OnLaughButtonClick(object sender, RoutedEventArgs e)
+        private async void OnLaughButtonClick(object sender, RoutedEventArgs e)
         {
             if (AppController.CurrentUser != null)
             {
-                this.reactionService.AddReaction(new Reaction { UserId = AppController.CurrentUser.ID, PostId = postId, Type = ReactionType.Laugh });
-                this.LoadReactionCounts();
+                await this.reactionService.AddReaction(new Reaction { UserId = AppController.CurrentUser.ID, PostId = postId, Type = ReactionType.Laugh });
+                await this.LoadReactionCounts();
             }
         }
 
-        private void OnAngryButtonClick(object sender, RoutedEventArgs e)
+        private async void OnAngryButtonClick(object sender, RoutedEventArgs e)
         {
             if (AppController.CurrentUser != null)
             {
-                this.reactionService.AddReaction(new Reaction { UserId = AppController.CurrentUser.ID, PostId = postId, Type = ReactionType.Anger });
-                this.LoadReactionCounts();
+                await this.reactionService.AddReaction(new Reaction { UserId = AppController.CurrentUser.ID, PostId = postId, Type = ReactionType.Anger });
+                await this.LoadReactionCounts();
             }
         }
 
-        private void OnCommentButtonClick(object sender, RoutedEventArgs e)
+        private async void OnCommentButtonClick(object sender, RoutedEventArgs e)
         {
-            this.LoadComments();
+            await this.LoadComments();
             this.CommentSection.Visibility = Visibility.Visible;
         }
 

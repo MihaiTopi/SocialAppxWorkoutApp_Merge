@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using ServerLibraryProject.DbRelationshipEntities;
-using Workout.Core.Models;
+﻿using Workout.Core.Models;
 
 namespace Workout.Core.IRepositories
 {
@@ -21,18 +16,18 @@ namespace Workout.Core.IRepositories
 
         Task<List<UserModel>> GetAllUsersAsync();
 
-        List<UserModel> GetUserFollowers(int id);
+        Task<List<UserModel>> GetUserFollowers(int id);
 
-        List<UserModel> GetUserFollowing(int id);
+        Task<List<UserModel>> GetUserFollowing(int id);
 
-        UserModel Save(UserModel entity);
+        Task<UserModel> Save(UserModel entity);
 
-        void Unfollow(int userId, int whoToUnfollowId);
+        Task Unfollow(int userId, int whoToUnfollowId);
 
-        void JoinGroup(int userId, long groupId);
+        Task JoinGroup(int userId, long groupId);
 
-        void ExitGroup(int userId, long groupId);
+        Task ExitGroup(int userId, long groupId);
 
-        public void Follow(int userId, int whoToFollowId);
+        Task Follow(int userId, int whoToFollowId);
     }
 }

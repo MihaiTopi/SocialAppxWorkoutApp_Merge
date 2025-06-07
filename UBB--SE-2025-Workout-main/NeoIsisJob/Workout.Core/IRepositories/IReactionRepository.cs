@@ -14,7 +14,7 @@
         /// </summary>
         /// <param name="userId">The ID of the user.</param>
         /// <param name="postId">The ID of the post.</param>
-        void Delete(int userId, long postId);
+        Task Delete(int userId, long postId);
 
         /// <summary>
         /// Retrieves all reactions.
@@ -27,7 +27,7 @@
         /// </summary>
         /// <param name="postId">The ID of the post.</param>
         /// <returns>A list of reactions for the specified post.</returns>
-        List<Reaction> GetReactionsByPostId(long postId);
+        Task<List<Reaction>> GetReactionsByPostId(long postId);
 
         /// <summary>
         /// Retrieves a reaction by a specific user for a specific post.
@@ -35,13 +35,13 @@
         /// <param name="userId">The ID of the user.</param>
         /// <param name="postId">The ID of the post.</param>
         /// <returns>The reaction for the specified user and post.</returns>
-        Reaction? GetReaction(int userId, long postId);
+        Task<Reaction?> GetReaction(int userId, long postId);
 
         /// <summary>
         /// Saves a new reaction to the repository.
         /// </summary>
         /// <param name="entity">The reaction entity to save.</param>
-        void Add(Reaction entity);
+        Task Add(Reaction entity);
 
         /// <summary>
         /// Updates the reaction type for a specific user and post.
@@ -49,6 +49,6 @@
         /// <param name="userId">The ID of the user.</param>
         /// <param name="postId">The ID of the post.</param>
         /// <param name="type">The new reaction type.</param>
-        void Update(int userId, long postId, ReactionType type);
+        Task Update(int userId, long postId, ReactionType type);
     }
 }

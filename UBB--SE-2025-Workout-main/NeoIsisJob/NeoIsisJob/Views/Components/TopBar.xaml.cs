@@ -6,7 +6,6 @@ namespace DesktopProject.Components
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
     using NeoIsisJob;
-    using NeoIsisJob.Views;
 
     public sealed partial class TopBar : UserControl
     {
@@ -24,9 +23,9 @@ namespace DesktopProject.Components
             SetNavigationButtons();
         }
 
-        private async void SetPhoto()
+        private void SetPhoto()
         {
-            if (AppController.CurrentUser != null && !string.IsNullOrEmpty(string.Empty))
+            if (AppController.CurrentUser != null)
             {
                 //UserImage.Source = await AppController.DecodeBase64ToImageAsync(controller.CurrentUser.Image);
             }
@@ -34,22 +33,15 @@ namespace DesktopProject.Components
 
         private void SetNavigationButtons()
         {
-
-            //SeeUsersButton.Click += UserClick;
+            HomeButton.Click += HomeClick;
             GroupsButton.Click += GroupsClick;
             CreatePostButton.Click += CreatePostButton_Click;
             SeeUsersButton.Click += SeeUsersClick;
-            
-        }
-
-        private void GoToNeo(object sender, RoutedEventArgs e)
-        {
-            frame.Navigate(typeof(MainPage));
         }
 
         private void HomeClick(object sender, RoutedEventArgs e)
         {
-            
+            HomeButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Blue);
             GroupsButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
             CreatePostButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
             frame.Navigate(typeof(HomeScreen));
@@ -58,21 +50,17 @@ namespace DesktopProject.Components
         private void GroupsClick(object sender, RoutedEventArgs e)
         {
 
-            
+            HomeButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
             GroupsButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Blue);
             CreatePostButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
             frame.Navigate(typeof(GroupsScreen));
 
         }
 
-        private void UserClick(object sender, RoutedEventArgs e)
-        {
-            frame.Navigate(typeof(LoginPage));
-        }
-
         private void SeeUsersClick(object sender, RoutedEventArgs e)
         {
             frame.Navigate(typeof(UserFollow));
+
         }
 
         private void CreatePostButton_Click(object sender, RoutedEventArgs e)
@@ -83,28 +71,33 @@ namespace DesktopProject.Components
 
         public void SetHome()
         {
-            
+            HomeButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Blue);
             GroupsButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
             CreatePostButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
         }
         public void SetGroups()
         {
+            HomeButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
             GroupsButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Blue);
             CreatePostButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
         }
         public void SetCreate()
         {
+            HomeButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
             GroupsButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
             CreatePostButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Blue);
         }
         public void SetNone()
         {
+            HomeButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
             GroupsButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
             CreatePostButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
         }
 
+        public Button HomeButtonInstance => HomeButton;
         public Button GroupsButtonInstance => GroupsButton;
         public Button CreatePostButtonInstance => CreatePostButton;
-        public Button UserButtonInstance => SeeUsersButton;
+
+        public Button UsersButtonInstance => SeeUsersButton;
     }
 }

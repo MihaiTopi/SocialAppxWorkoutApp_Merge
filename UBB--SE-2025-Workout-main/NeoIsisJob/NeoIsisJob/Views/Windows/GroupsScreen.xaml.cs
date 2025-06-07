@@ -1,13 +1,12 @@
 namespace DesktopProject.Windows
 {
+    using DesktopProject.Pages;
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
     using Microsoft.UI.Xaml.Navigation;
-    using NeoIsisJob.Views;
 
     public sealed partial class GroupsScreen : Page
     {
-
         public GroupsScreen()
         {
             this.InitializeComponent();
@@ -24,7 +23,8 @@ namespace DesktopProject.Windows
 
         private void SetNavigation()
         {
-            TopBar.UserButtonInstance.Click += UserClick;
+            TopBar.HomeButtonInstance.Click += HomeClick; // Updated to use the public property  
+            TopBar.UsersButtonInstance.Click += UserClick;
             TopBar.GroupsButtonInstance.Click += GroupsClick;
         }
 
@@ -35,7 +35,7 @@ namespace DesktopProject.Windows
 
         private void UserClick(object sender, RoutedEventArgs e)
         {
-            this.Frame.Navigate(typeof(LoginPage));
+            this.Frame.Navigate(typeof(UserFollow));
         }
 
         private void GroupsClick(object sender, RoutedEventArgs e)

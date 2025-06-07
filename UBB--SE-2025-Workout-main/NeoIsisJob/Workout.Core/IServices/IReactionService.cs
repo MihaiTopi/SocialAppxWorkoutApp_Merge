@@ -6,10 +6,10 @@ namespace Workout.Core.IServices
     {
         //List<Reaction> GetAllReactions();
 
-        List<Reaction> GetReactionsByPostId(long postId);
+        Task<List<Reaction>> GetReactionsByPostId(long postId);
 
-        void AddReaction(Reaction reaction);
+        Task AddReaction(Reaction reaction);
 
-        Reaction GetReaction(int userId, long postId);
+        Task<Reaction> GetReaction(int userId, long postId);
     }
 }

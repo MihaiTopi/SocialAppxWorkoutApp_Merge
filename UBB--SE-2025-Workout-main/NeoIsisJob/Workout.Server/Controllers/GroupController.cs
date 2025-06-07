@@ -16,52 +16,49 @@ namespace ServerAPIProject.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Group>> GetAllGroups()
+        public async Task<ActionResult<List<Group>>> GetAllGroups()
         {
-            return Ok(groupService.GetAllGroups());
+            return this.Ok(await groupService.GetAllGroups());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Group> GetGroupById(int id)
+        public async Task<ActionResult<Group>> GetGroupById(int id)
         {
             try
             {
-                return Ok(groupService.GetGroupById(id));
+                return this.Ok(await this.groupService.GetGroupById(id));
 
             }
             catch (Exception ex)
             {
-                return NotFound($"Group with ID {id} not found. Error: {ex.Message}");
+                return this.NotFound($"Group with ID {id} not found. Error: {ex.Message}");
             }
         }
 
         [HttpGet("{id}/users")]
-        public ActionResult<List<UserModel>> GetUsersFromGroup(int id)
+        public async Task<ActionResult<List<UserModel>>> GetUsersFromGroup(int id)
         {
-            return Ok(groupService.GetUsersFromGroup(id));
+            return this.Ok(await this.groupService.GetUsersFromGroup(id));
         }
 
-
         [HttpPost]
-        public IActionResult SaveGroup([FromBody] Group group)
+        public async Task<IActionResult> SaveGroup([FromBody] Group group)
         {
             try
             {
-                var newGroup = groupService.AddGroup(group.Name, group.Description);
-                return Ok(newGroup);
+                var newGroup = await this.groupService.AddGroup(group.Name, group.Description);
+                return this.Ok(newGroup);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return this.BadRequest(ex.Message);
             }
         }
 
         [HttpGet("{userId}/groups")]
-        public ActionResult<List<Group>> GetGroupsForUser(int userId)
+        public async Task<ActionResult<List<Group>>> GetGroupsForUser(int userId)
         {
-            return Ok(groupService.GetUserGroups(userId));
+            return Ok(await groupService.GetUserGroups(userId));
         }
-
-
     }
 }

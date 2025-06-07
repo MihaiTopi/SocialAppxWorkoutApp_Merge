@@ -78,54 +78,54 @@ namespace Workout.Core.Services
             return user.Password == password ? user.ID : -1; // -1 for wrong password
         }
 
-        public UserModel GetUserByUsername(string username)
+        public async Task<UserModel> GetUserByUsername(string username)
         {
-            return this._userRepo.GetUserByUsernameAsync(username).Result;
+            return await this._userRepo.GetUserByUsernameAsync(username);
         }
 
-        public void JoinGroup(int userId, long groupId)
+        public async Task JoinGroup(int userId, long groupId)
         {
-            this._userRepo.JoinGroup(userId, groupId);
+            await this._userRepo.JoinGroup(userId, groupId);
         }
 
-        public void ExitGroup(int userId, long groupId)
+        public async Task ExitGroup(int userId, long groupId)
         {
-            this._userRepo.ExitGroup(userId, groupId);
+            await this._userRepo.ExitGroup(userId, groupId);
         }
 
-        public List<UserModel> GetUserFollowing(int id)
+        public async Task<List<UserModel>> GetUserFollowing(int id)
         {
-            return this._userRepo.GetUserFollowing(id);
+            return await this._userRepo.GetUserFollowing(id);
         }
 
-        public void FollowUserById(int userId, int whoToFollowId)
+        public async Task FollowUserById(int userId, int whoToFollowId)
         {
-            if (this._userRepo.GetUserByIdAsync((int)userId) == null)
+            if (await this._userRepo.GetUserByIdAsync((int)userId) == null)
             {
                 throw new Exception("User does not exist");
             }
 
-            if (this._userRepo.GetUserByIdAsync((int)whoToFollowId) == null)
+            if (await this._userRepo.GetUserByIdAsync((int)whoToFollowId) == null)
             {
                 throw new Exception("User to follow does not exist");
             }
 
-            this._userRepo.Follow(userId, whoToFollowId);
+            await this._userRepo.Follow(userId, whoToFollowId);
         }
 
-        public void UnfollowUserById(int userId, int whoToUnfollowId)
+        public async Task UnfollowUserById(int userId, int whoToUnfollowId)
         {
-            if (this._userRepo.GetUserByIdAsync((int)userId) == null)
+            if (await this._userRepo.GetUserByIdAsync((int)userId) == null)
             {
                 throw new Exception("User does not exist");
             }
 
-            if (this._userRepo.GetUserByIdAsync((int)whoToUnfollowId) == null)
+            if (await this._userRepo.GetUserByIdAsync((int)whoToUnfollowId) == null)
             {
                 throw new Exception("User to unfollow does not exist");
             }
 
-            this._userRepo.Unfollow(userId, whoToUnfollowId);
+            await this._userRepo.Unfollow(userId, whoToUnfollowId);
         }
     }
 }

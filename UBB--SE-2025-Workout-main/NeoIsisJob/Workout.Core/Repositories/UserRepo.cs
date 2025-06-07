@@ -67,16 +67,16 @@ namespace Workout.Core.Repositories
             return await context.Users.ToListAsync();
         }
 
-        public List<UserModel> GetUserFollowers(int id)
+        public async Task<List<UserModel>> GetUserFollowers(int id)
 
         {
             List<UserModel> userFollowers = new List<UserModel>();
-            List<UserFollower> followers = context.UserFollowers
+            List<UserFollower> followers = await this.context.UserFollowers
                 .Where(uf => uf.UserId == id)
-                .ToList();
+                .ToListAsync();
             foreach (UserFollower userFollower in followers)
             {
-                UserModel? user = context.Users.FirstOrDefault(u => u.ID == userFollower.FollowerId);
+                UserModel? user = await context.Users.FirstOrDefaultAsync(u => u.ID == userFollower.FollowerId);
                 if (user != null)
                 {
                     userFollowers.Add(user);
@@ -86,26 +86,26 @@ namespace Workout.Core.Repositories
             return userFollowers;
         }
 
-        public List<UserModel> GetUserFollowing(int id)
+        public async Task<List<UserModel>> GetUserFollowing(int id)
         {
             var userFollowers = context.UserFollowers
                .Where(uf => uf.UserId == id);
-            return context.Users
+            return await context.Users
                 .Where(u => userFollowers.Any(uf => uf.FollowerId == u.ID))
-                .ToList();
+                .ToListAsync();
         }
 
-        public UserModel Save(UserModel entity)
+        public async Task<UserModel> Save(UserModel entity)
         {
             try
             {
-                if (context.Users.FirstOrDefault(u => u.Username.Equals(entity.Username)) != null)
+                if (await context.Users.FirstOrDefaultAsync(u => u.Username.Equals(entity.Username)) != null)
                 {
                     throw new Exception("User already exists");
                 }
 
-                context.Users.Add(entity);
-                context.SaveChanges();
+                await context.Users.AddAsync(entity);
+                await context.SaveChangesAsync();
                 return entity;
             }
             catch
@@ -115,7 +115,7 @@ namespace Workout.Core.Repositories
 
         }
 
-        public void JoinGroup(int userId, long groupId)
+        public async Task JoinGroup(int userId, long groupId)
         {
             try
             {
@@ -124,8 +124,8 @@ namespace Workout.Core.Repositories
                     UserId = userId,
                     GroupId = groupId
                 };
-                context.GroupUsers.Add(groupUser);
-                context.SaveChanges();
+                await context.GroupUsers.AddAsync(groupUser);
+                await context.SaveChangesAsync();
             }
             catch
             {
@@ -133,18 +133,18 @@ namespace Workout.Core.Repositories
             }
         }
 
-        public void ExitGroup(int userId, long groupId)
+        public async Task ExitGroup(int userId, long groupId)
         {
             try
             {
                 // Find the GroupUser entry that matches the user and group
-                GroupUser? groupUser = context.GroupUsers
-                    .FirstOrDefault(gu => gu.UserId == userId && gu.GroupId == groupId);
+                GroupUser? groupUser = await context.GroupUsers
+                    .FirstOrDefaultAsync(gu => gu.UserId == userId && gu.GroupId == groupId);
 
                 if (groupUser != null)
                 {
                     context.GroupUsers.Remove(groupUser);
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
                 else
                 {
@@ -157,12 +157,12 @@ namespace Workout.Core.Repositories
             }
         }
 
-        public void Unfollow(int userId, int whoToUnfollowId)
+        public async Task Unfollow(int userId, int whoToUnfollowId)
         {
             try
             {
                 context.UserFollowers.Remove(new UserFollower(userId, whoToUnfollowId));
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -170,12 +170,12 @@ namespace Workout.Core.Repositories
             }
         }
 
-        public void Follow(int userId, int whoToFollowId)
+        public async Task Follow(int userId, int whoToFollowId)
         {
             try
             {
-                context.UserFollowers.Add(new UserFollower(userId, whoToFollowId));
-                context.SaveChanges();
+                await context.UserFollowers.AddAsync(new UserFollower(userId, whoToFollowId));
+                await context.SaveChangesAsync();
             }
             catch
             {

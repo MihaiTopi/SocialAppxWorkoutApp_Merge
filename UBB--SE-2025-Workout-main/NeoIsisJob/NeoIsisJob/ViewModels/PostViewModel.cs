@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Threading.Tasks;
     using DesktopProject.Components;
     using Workout.Core.Enums;
     using Workout.Core.IServices;
@@ -11,6 +12,7 @@
     {
         ObservableCollection<PostComponent> posts;
         private IPostService postService;
+
         public PostViewModel(IPostService postService)
         {
             this.postService = postService;
@@ -37,9 +39,9 @@
         }
 
 
-        public void AddPost(string title, string? content, int userId, long? groupId, PostVisibility postVisibility, PostTag postTag)
+        public async Task AddPost(string title, string? content, int userId, long? groupId, PostVisibility postVisibility, PostTag postTag)
         {
-            this.postService.AddPost(title, content, userId, groupId, postVisibility, postTag);
+            await this.postService.AddPost(title, content, userId, groupId, postVisibility, postTag);
         }
 
         /// <summary>
@@ -70,9 +72,9 @@
         /// Gets all posts.
         /// </summary>
         /// <returns>A list of all posts.</returns>
-        public void GetAllPosts()
+        public async Task GetAllPosts()
         {
-            var posts = this.postService.GetAllPosts();
+            var posts = await this.postService.GetAllPosts();
             this.PopulatePosts(posts);
         }
 
@@ -81,23 +83,23 @@
         /// </summary>
         /// <param name="id">The ID of the post to retrieve.</param>
         /// <returns>The post with the specified ID.</returns>
-        public Post GetPostById(long id)
+        public async Task<Post> GetPostById(long id)
         {
-            return this.postService.GetPostById(id);
+            return await this.postService.GetPostById(id);
         }
 
         /// <summary>
         /// Gets posts by user ID.
         /// </summary>
         /// <param name="userId">The ID of the user whose posts to retrieve.</param>
-        public void PopulatePostsByUserId(int userId)
+        public async Task PopulatePostsByUserId(int userId)
         {
-            var posts = this.postService.GetPostsByUserId(userId);
+            var posts = await this.postService.GetPostsByUserId(userId);
         }
 
-        public void PopulatePostsByGroupId(long groupId)
+        public async Task PopulatePostsByGroupId(long groupId)
         {
-            var posts = this.postService.GetPostsByGroupId(groupId);
+            var posts = await this.postService.GetPostsByGroupId(groupId);
             this.PopulatePosts(posts);
         }
 
@@ -106,9 +108,9 @@
         //    var posts = this.postService.GetPostsGroupsFeed(userId);
         //}
 
-        public void PopulatePostsHomeFeed(int userId)
+        public async Task PopulatePostsHomeFeed(int userId)
         {
-            var posts = this.postService.GetPostsHomeFeed(userId);
+            var posts = await this.postService.GetPostsHomeFeed(userId);
             this.PopulatePosts(posts);
         }
     }

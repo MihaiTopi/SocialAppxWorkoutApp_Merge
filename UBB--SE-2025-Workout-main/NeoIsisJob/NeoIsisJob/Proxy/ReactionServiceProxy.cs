@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Json;
+    using System.Threading.Tasks;
     using Workout.Core.IServices;
     using Workout.Core.Models;
 
@@ -17,29 +18,29 @@
             this.httpClient.BaseAddress = new Uri("http://localhost:5261/api/reactions/");
         }
 
-        public List<Reaction> GetReactionsByPostId(long postId)
+        public async Task<List<Reaction>> GetReactionsByPostId(long postId)
         {
             var client = new HttpClient();
-            var response = client.GetAsync($"http://localhost:5261/api/posts/{postId}/reactions").Result!;
+            var response = await client.GetAsync($"http://localhost:5261/api/posts/{postId}/reactions");
 
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<List<Reaction>>().Result ?? new List<Reaction>();
+                return await response.Content.ReadFromJsonAsync<List<Reaction>>() ?? new List<Reaction>();
             }
 
             return new List<Reaction>();
         }
 
-        public Reaction? GetReaction(int userId, long postId)
+        public async Task<Reaction?> GetReaction(int userId, long postId)
         {
-            var response = this.httpClient.GetAsync($"{userId}/{postId}").Result;
+            var response = await this.httpClient.GetAsync($"{userId}/{postId}");
 
             if (response.IsSuccessStatusCode)
             {
-                var content = response.Content.ReadAsStringAsync().Result;
+                var content = await response.Content.ReadAsStringAsync();
                 if (!string.IsNullOrWhiteSpace(content))
                 {
-                    var reaction = response.Content.ReadFromJsonAsync<Reaction>().Result;
+                    var reaction = await response.Content.ReadFromJsonAsync<Reaction>();
                     return reaction;
                 }
             }
@@ -47,9 +48,9 @@
             return null;
         }
 
-        public void AddReaction(Reaction reaction)
+        public async Task AddReaction(Reaction reaction)
         {
-            var response = this.httpClient.PostAsJsonAsync(string.Empty, reaction).Result;
+            var response = await this.httpClient.PostAsJsonAsync(string.Empty, reaction);
             if (response.IsSuccessStatusCode)
             {
                 return;

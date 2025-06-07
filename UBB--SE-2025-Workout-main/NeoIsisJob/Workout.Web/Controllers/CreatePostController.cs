@@ -23,13 +23,13 @@ namespace ServerMVCProject.Controllers
 
         [Route("create")]
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             string userIdStr = HttpContext.Session.GetString("UserId");
 
             int userId = int.Parse(userIdStr);
 
-            var userGroups = this.groupService.GetUserGroups(userId);
+            var userGroups = await this.groupService.GetUserGroups(userId);
 
             ViewBag.UserGroups = userGroups.Select(g => new SelectListItem
             {
@@ -52,7 +52,7 @@ namespace ServerMVCProject.Controllers
             int userId = int.Parse(userIdStr);
 
             var userGroups = this.groupService.GetUserGroups(userId);
-            ViewBag.UserGroups = userGroups.Select(g => new SelectListItem
+            ViewBag.UserGroups = (await userGroups).Select(g => new SelectListItem
             {
                 Text = g.Name,
                 Value = g.Id.ToString()
@@ -71,7 +71,7 @@ namespace ServerMVCProject.Controllers
             };
             try
             {
-                postService.AddPost(newPost.Title, newPost.Content, newPost.UserId, newPost.GroupId, newPost.Visibility, newPost.Tag);
+                await postService.AddPost(newPost.Title, newPost.Content, newPost.UserId, newPost.GroupId, newPost.Visibility, newPost.Tag);
                 ViewBag.Message = "Post created successfully!";
                 return RedirectToAction("Index", "ViewPosts");
             }

@@ -86,11 +86,10 @@ namespace NeoIsisJob
             serviceCollection.AddScoped<WishlistServiceProxy>();
             serviceCollection.AddScoped<OrderServiceProxy>();
             serviceCollection.AddScoped<CalendarServiceProxy>();
-            serviceCollection.AddScoped<IPostService,PostServiceProxy>();
-            serviceCollection.AddScoped<ICommentService,CommentServiceProxy>();
-            serviceCollection.AddScoped<IGroupService,GroupServiceProxy>();
-            serviceCollection.AddScoped<IReactionService,ReactionServiceProxy>();
-
+            serviceCollection.AddScoped<IPostService, PostServiceProxy>();
+            serviceCollection.AddScoped<ICommentService, CommentServiceProxy>();
+            serviceCollection.AddScoped<IGroupService, GroupServiceProxy>();
+            serviceCollection.AddScoped<IReactionService, ReactionServiceProxy>();
 
             // Configure ApiSettings options
             /*serviceCollection.Configure<ApiSettings>(options =>

@@ -8,7 +8,6 @@ namespace NeoIsisJob.Proxy
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.Extensions.Configuration;
     using Workout.Core.IServices;
     using Workout.Core.Models;
     using Workout.Core.Utils.Filters;
@@ -166,21 +165,18 @@ namespace NeoIsisJob.Proxy
         /// <inheritdoc/>
         public async Task<IEnumerable<MealModel>> GetAllAsync()
         {
-            await Task.Delay(100); // Simulate async operation
             return SampleMeals;
         }
 
         /// <inheritdoc/>
         public async Task<MealModel> GetByIdAsync(int id)
         {
-            await Task.Delay(50); // Simulate async operation
             return SampleMeals.FirstOrDefault(m => m.Id == id);
         }
 
         /// <inheritdoc/>
         public async Task<MealModel> CreateAsync(MealModel meal)
         {
-            await Task.Delay(100); // Simulate async operation
             meal.Id = SampleMeals.Count > 0 ? SampleMeals.Max(m => m.Id) + 1 : 1;
             SampleMeals.Add(meal);
             return meal;
@@ -189,7 +185,6 @@ namespace NeoIsisJob.Proxy
         /// <inheritdoc/>
         public async Task<MealModel> UpdateAsync(MealModel meal)
         {
-            await Task.Delay(100); // Simulate async operation
             var existingMeal = SampleMeals.FirstOrDefault(m => m.Id == meal.Id);
             if (existingMeal != null)
             {
@@ -203,7 +198,6 @@ namespace NeoIsisJob.Proxy
         /// <inheritdoc/>
         public async Task<bool> DeleteAsync(int id)
         {
-            await Task.Delay(100); // Simulate async operation
             var meal = SampleMeals.FirstOrDefault(m => m.Id == id);
             if (meal != null)
             {
@@ -216,8 +210,6 @@ namespace NeoIsisJob.Proxy
         /// <inheritdoc/>
         public async Task<IEnumerable<MealModel>> GetFilteredAsync(IFilter filter)
         {
-            await Task.Delay(50); // Simulate async operation
-            
             if (filter is not MealFilter mealFilter)
             {
                 return SampleMeals;
@@ -267,7 +259,6 @@ namespace NeoIsisJob.Proxy
         /// <returns>A collection of meals of the specified type.</returns>
         public async Task<IEnumerable<MealModel>> GetByTypeAsync(string type)
         {
-            await Task.Delay(50); // Simulate async operation
             return SampleMeals.Where(m => m.Type.Equals(type, StringComparison.OrdinalIgnoreCase));
         }
     }

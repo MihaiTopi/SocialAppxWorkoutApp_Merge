@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using DesktopProject;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -60,7 +61,7 @@ namespace NeoIsisJob.Views
             LoadTodaysWorkout();
         }
 
-        private void LoadTodaysWorkout()
+        private async Task LoadTodaysWorkout()
         {
             try
             {
@@ -71,17 +72,17 @@ namespace NeoIsisJob.Views
                 if (todaysWorkoutId.HasValue)
                 {
                     // Get the workout details
-                    currentWorkout = workoutService.GetWorkoutAsync(todaysWorkoutId.Value).Result;
+                    currentWorkout = await workoutService.GetWorkoutAsync(todaysWorkoutId.Value);
 
                     if (currentWorkout != null)
                     {
                         // Get the exercises for this workout
-                        var completeWorkouts = completeWorkoutService.GetCompleteWorkoutsByWorkoutIdAsync(currentWorkout.WID).Result;
+                        var completeWorkouts = await completeWorkoutService.GetCompleteWorkoutsByWorkoutIdAsync(currentWorkout.WID);
                         currentWorkoutExercises = new List<ExerciseWithDetails>();
 
                         foreach (var completeWorkout in completeWorkouts)
                         {
-                            var exercise = exerciseService.GetExerciseByIdAsync(completeWorkout.EID).Result;
+                            var exercise = await exerciseService.GetExerciseByIdAsync(completeWorkout.EID);
                             if (exercise != null)
                             {
                                 currentWorkoutExercises.Add(new ExerciseWithDetails

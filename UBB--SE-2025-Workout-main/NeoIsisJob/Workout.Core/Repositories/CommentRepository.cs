@@ -1,5 +1,6 @@
 ﻿namespace ServerLibraryProject.Repositories
 {
+    using Microsoft.EntityFrameworkCore;
     using ServerLibraryProject.Interfaces;
     using ServerLibraryProject.Models;
     using Workout.Core.Data;
@@ -17,9 +18,9 @@
         /// Retrieves all comments from the database.
         /// </summary>
         /// <returns>A list of all Comment entities in the system.</returns>
-        public List<Comment> GetAllComments()
+        public Task<List<Comment>> GetAllComments()
         {
-            return this.dbContext.Comments.ToList();
+            return this.dbContext.Comments.ToListAsync();
         }
 
         /// <summary>
@@ -27,9 +28,9 @@
         /// </summary>
         /// <param name="postId">The ID of the post to retrieve comments for.</param>
         /// <returns>A list of Comment entities for the specified post.</returns>
-        public List<Comment> GetCommentsByPostId(long postId)
+        public Task<List<Comment>> GetCommentsByPostId(long postId)
         {
-            return this.dbContext.Comments.Where(c => c.PostId == postId).ToList();
+            return this.dbContext.Comments.Where(c => c.PostId == postId).ToListAsync();
         }
 
         /// <summary>
@@ -68,18 +69,19 @@
         /// Saves a new comment to the database.
         /// </summary>
         /// <param name="entity">The Comment entity to be saved.</param>
-        public void SaveComment(Comment entity)
+        public async Task SaveComment(Comment entity)
         {
             try
             {
-                this.dbContext.Comments.Add(entity);
-                this.dbContext.SaveChanges();
+                await this.dbContext.Comments.AddAsync(entity);
+                await this.dbContext.SaveChangesAsync();
             }
             catch
             {
                 throw new Exception("Error saving comment. Please try again later.");
             }
 
+            return;
         }
 
         /// <summary>

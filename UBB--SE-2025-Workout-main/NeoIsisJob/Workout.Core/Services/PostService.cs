@@ -41,14 +41,14 @@
         /// <param name="postVisibility">The visibility of the post.</param>
         /// <param name="postTag">The tag of the post.</param>
         /// <returns>The created post.</returns>
-        public void AddPost(string title, string content, int userId, long? groupId, PostVisibility postVisibility, PostTag postTag)
+        public async Task AddPost(string title, string content, int userId, long? groupId, PostVisibility postVisibility, PostTag postTag)
         {
             if (title == null || title.Length == 0)
             {
                 throw new Exception("Post title cannot be empty");
             }
 
-            if (this.userService.GetUserByIdAsync(userId).Result == null)
+            if (await this.userService.GetUserByIdAsync(userId) == null)
             {
                 throw new Exception("User does not exist");
             }
@@ -62,7 +62,7 @@
             }
 
             Post post = new Post() { Title = title, Content = content, UserId = userId, GroupId = groupId, Visibility = postVisibility, Tag = postTag, CreatedDate = DateTime.Now };
-            this.postRepository.SavePost(post);
+            await this.postRepository.SavePost(post);
         }
 
         /// <summary>
@@ -101,9 +101,9 @@
         /// Gets all posts.
         /// </summary>
         /// <returns>A list of all posts.</returns>
-        public List<Post> GetAllPosts()
+        public async Task<List<Post>> GetAllPosts()
         {
-            return this.postRepository.GetAllPosts();
+            return await this.postRepository.GetAllPosts();
         }
 
         /// <summary>
@@ -111,9 +111,9 @@
         /// </summary>
         /// <param name="id">The ID of the post to retrieve.</param>
         /// <returns>The post with the specified ID.</returns>
-        public Post GetPostById(long id)
+        public async Task<Post> GetPostById(long id)
         {
-            return this.postRepository.GetPostById(id);
+            return await this.postRepository.GetPostById(id);
         }
 
         /// <summary>
@@ -121,9 +121,9 @@
         /// </summary>
         /// <param name="userId">The ID of the user whose posts to retrieve.</param>
         /// <returns>A list of posts by the specified user.</returns>
-        public List<Post> GetPostsByUserId(int userId)
+        public async Task<List<Post>> GetPostsByUserId(int userId)
         {
-            return this.postRepository.GetPostsByUserId(userId);
+            return await this.postRepository.GetPostsByUserId(userId);
         }
 
         /// <summary>
@@ -131,9 +131,9 @@
         /// </summary>
         /// <param name="groupId">The ID of the group whose posts to retrieve.</param>
         /// <returns>A list of posts in the specified group.</returns>
-        public List<Post> GetPostsByGroupId(long groupId)
+        public async Task<List<Post>> GetPostsByGroupId(long groupId)
         {
-            return this.postRepository.GetPostsByGroupId(groupId);
+            return await this.postRepository.GetPostsByGroupId(groupId);
         }
 
         /// <summary>
@@ -141,9 +141,9 @@
         /// </summary>
         /// <param name="userId">The ID of the user whose home feed to retrieve.</param>
         /// <returns>A list of posts for the user's home feed.</returns>
-        public List<Post> GetPostsHomeFeed(int userId)
+        public async Task<List<Post>> GetPostsHomeFeed(int userId)
         {
-            return this.postRepository.GetPostsHomeFeed(userId);
+            return await this.postRepository.GetPostsHomeFeed(userId);
         }
 
         /// <summary>

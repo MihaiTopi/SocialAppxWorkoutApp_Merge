@@ -4,6 +4,7 @@ namespace NeoIsisJob.Proxy
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Json;
+    using System.Threading.Tasks;
     using ServerLibraryProject.Interfaces;
     using Workout.Core.Enums;
     using Workout.Core.IServices;
@@ -27,7 +28,7 @@ namespace NeoIsisJob.Proxy
             };
         }
 
-        public void AddPost(string title, string content, int userId, long? groupId, PostVisibility postVisibility, PostTag postTag)
+        public async Task AddPost(string title, string content, int userId, long? groupId, PostVisibility postVisibility, PostTag postTag)
         {
             Post newPost = new Post
             {
@@ -39,7 +40,7 @@ namespace NeoIsisJob.Proxy
                 Tag = postTag,
                 CreatedDate = DateTime.UtcNow,
             };
-            var response = this.httpClient.PostAsJsonAsync(string.Empty, newPost).Result;
+            var response = await this.httpClient.PostAsJsonAsync(string.Empty, newPost);
             if (!response.IsSuccessStatusCode)
             {
                 throw new Exception($"Failed to add post: {response.StatusCode}");
@@ -63,13 +64,13 @@ namespace NeoIsisJob.Proxy
         /// Retrieves all posts.
         /// </summary>
         /// <returns>A list of all posts, or an empty list if none are found.</returns>
-        public List<Post> GetAllPosts()
+        public async Task<List<Post>> GetAllPosts()
         {
-            var response = this.httpClient.GetAsync(string.Empty).Result;
+            var response = await this.httpClient.GetAsync(string.Empty);
 
             if (response.IsSuccessStatusCode)
             {
-                var posts = response.Content.ReadFromJsonAsync<List<Post>>().Result;
+                var posts = await response.Content.ReadFromJsonAsync<List<Post>>();
                 return posts ?? new List<Post>();
             }
 
@@ -81,15 +82,14 @@ namespace NeoIsisJob.Proxy
         /// </summary>
         /// <param name="postId">The ID of the post.</param>
         /// <returns>The post if found, or a default post object if not found (404).</returns>
-        public Post GetPostById(long postId)
+        public async Task<Post> GetPostById(long postId)
         {
-            var response = this.httpClient.GetAsync($"{postId}").Result;
+            var response = await this.httpClient.GetAsync($"{postId}");
 
             if (response.IsSuccessStatusCode)
             {
-                var post = response.Content.ReadFromJsonAsync<Post>().Result;
+                var post = await response.Content.ReadFromJsonAsync<Post>();
             }
-
 
             throw new Exception($"Failed to get post {postId}: {response.StatusCode}");
         }
@@ -99,13 +99,13 @@ namespace NeoIsisJob.Proxy
         /// </summary>
         /// <param name="groupId">The group ID.</param>
         /// <returns>A list of posts, or an empty list if none are found.</returns>
-        public List<Post> GetPostsByGroupId(long groupId)
+        public async Task<List<Post>> GetPostsByGroupId(long groupId)
         {
-            var response = this.httpClient.GetAsync($"group/{groupId}").Result;
+            var response = await this.httpClient.GetAsync($"group/{groupId}");
 
             if (response.IsSuccessStatusCode)
             {
-                var posts = response.Content.ReadFromJsonAsync<List<Post>>().Result;
+                var posts = await response.Content.ReadFromJsonAsync<List<Post>>();
                 return posts ?? new List<Post>();
             }
 
@@ -117,13 +117,13 @@ namespace NeoIsisJob.Proxy
         /// </summary>
         /// <param name="userId">The user ID.</param>
         /// <returns>A list of posts, or an empty list if none are found.</returns>
-        public List<Post> GetPostsByUserId(int userId)
+        public async Task<List<Post>> GetPostsByUserId(int userId)
         {
-            var response = this.httpClient.GetAsync($"user/{userId}").Result;
+            var response = await this.httpClient.GetAsync($"user/{userId}");
 
             if (response.IsSuccessStatusCode)
             {
-                var posts = response.Content.ReadFromJsonAsync<List<Post>>().Result;
+                var posts = await response.Content.ReadFromJsonAsync<List<Post>>();
                 return posts ?? new List<Post>();
             }
 
@@ -154,13 +154,13 @@ namespace NeoIsisJob.Proxy
         /// </summary>
         /// <param name="userId">The user's ID.</param>
         /// <returns>A list of home feed posts, or an empty list if none are found.</returns>
-        public List<Post> GetPostsHomeFeed(int userId)
+        public async Task<List<Post>> GetPostsHomeFeed(int userId)
         {
-            var response = this.httpClient.GetAsync($"user/{userId}/homefeed").Result;
+            var response = await this.httpClient.GetAsync($"user/{userId}/homefeed");
 
             if (response.IsSuccessStatusCode)
             {
-                var posts = response.Content.ReadFromJsonAsync<List<Post>>().Result;
+                var posts = await response.Content.ReadFromJsonAsync<List<Post>>();
                 return posts ?? new List<Post>();
             }
 

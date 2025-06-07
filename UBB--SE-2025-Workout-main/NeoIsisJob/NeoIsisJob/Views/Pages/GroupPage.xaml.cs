@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using DesktopProject.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -7,8 +8,7 @@ using Microsoft.UI.Xaml.Navigation;
 using NeoIsisJob;
 using Workout.Core.IServices;
 using Workout.Core.Models;
-using System.Collections.ObjectModel;
-using System.Linq;
+
 
 namespace DesktopProject.Pages
 {
@@ -22,69 +22,70 @@ namespace DesktopProject.Pages
         private long GroupId;
         private Group group;
 
-        private ObservableCollection<UserModel> groupMembers = new();
-
         public GroupPage()
         {
             this.InitializeComponent();
-            this.Loaded += DisplayPage;
+            this.Loaded += this.DisplayPageAsync; // Fix: Use a method group that matches the RoutedEventHandler delegate
+        }
 
-            MembersItemsControl.ItemsSource = groupMembers;
+        private async void DisplayPageAsync(object sender, RoutedEventArgs e) // Fix: Change the method signature to match RoutedEventHandler
+        {
+            await this.DisplayPage(sender, e);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             if (e.Parameter is long id)
             {
-                GroupId = id;
+                this.GroupId = id;
             }
-            TopBar.SetFrame(this.Frame);
-            TopBar.SetNone();
+
+            this.TopBar.SetFrame(this.Frame);
+            this.TopBar.SetNone();
         }
 
-        private void DisplayPage(object sender, RoutedEventArgs e)
+        private async Task DisplayPage(object sender, RoutedEventArgs e)
         {
-            userService = App.Services.GetService<IUserService>();
-            groupService = App.Services.GetService<IGroupService>();
-            postService = App.Services.GetService<IPostService>();
+            this.userService = App.Services.GetService<IUserService>();
+            this.groupService = App.Services.GetService<IGroupService>();
+            this.postService = App.Services.GetService<IPostService>();
 
-            group = groupService.GetGroupById(GroupId);
+            this.group = await this.groupService.GetGroupById(this.GroupId);
 
-            SetContent();
-            PopulateMembers();
+            await this.SetContent();
+            await this.PopulateMembers();
         }
 
-        private async void SetContent()
+        private async Task SetContent()
         {
             GroupTitle.Text = group.Name;
             GroupDescription.Text = group.Description;
             // if (!string.IsNullOrEmpty(group.Image))
             // GroupImage.Source = await AppController.DecodeBase64ToImageAsync(group.Image);
-            PopulateFeed();
+            await this.PopulateFeed();
         }
 
-        private void PopulateFeed()
+        private async Task PopulateFeed()
         {
             this.PostsFeed.ClearPosts();
-            this.PostsFeed.PopulatePostsByGroupId(GroupId);
+            await this.PostsFeed.PopulatePostsByGroupId(GroupId);
             PostsFeed.Visibility = Visibility.Visible;
             PostsFeed.DisplayCurrentPage();
         }
 
-        private void PopulateMembers()
+        private async Task PopulateMembers()
         {
-            groupMembers.Clear();
-
-            List<UserModel> members = groupService.GetUsersFromGroup(GroupId);
+            this.MembersList.Children.Clear();
+            List<UserModel> members = await groupService.GetUsersFromGroup(GroupId);
             foreach (UserModel member in members)
             {
-                groupMembers.Add(member);
+                this.MembersList.Children.Add(new Member(member, this.Frame, GroupId));
             }
         }
 
         private void CreatePostInGroupButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(CreatePost), GroupId);
+            Frame.Navigate(typeof(CreatePost));
         }
     }
 }

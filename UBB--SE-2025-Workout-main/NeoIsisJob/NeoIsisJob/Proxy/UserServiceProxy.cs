@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -73,15 +74,15 @@ namespace NeoIsisJob.Proxy
             }
         }
 
-        public UserModel GetUserByUsername(string username)
+        public async Task<UserModel> GetUserByUsername(string username)
         {
-            var response = this.httpClient.GetAsync($"user/user?username={username}").Result;
+            var response = await this.httpClient.GetAsync($"user/user?username={username}");
             if (response.IsSuccessStatusCode)
             {
-                var content = response.Content.ReadAsStringAsync().Result;
+                var content = await response.Content.ReadAsStringAsync();
                 if (!string.IsNullOrWhiteSpace(content))
                 {
-                    var user = response.Content.ReadFromJsonAsync<UserModel>().Result;
+                    var user = await response.Content.ReadFromJsonAsync<UserModel>();
                     return user;
                 }
             }
@@ -89,7 +90,7 @@ namespace NeoIsisJob.Proxy
             return null;
         }
 
-        public long AddUser(string username, string password, string image)
+        public async Task<int> AddUser(string username, string password, string image)
         {
             if (string.IsNullOrEmpty(username))
             {
@@ -107,7 +108,7 @@ namespace NeoIsisJob.Proxy
                 Password = password,
             };
 
-            var response = this.httpClient.PostAsJsonAsync(string.Empty, user).Result;
+            var response = await this.httpClient.PostAsJsonAsync(string.Empty, user);
             if (!response.IsSuccessStatusCode)
             {
                 Debug.WriteLine($"Failed to add user. Status: {response.StatusCode}");
@@ -116,34 +117,65 @@ namespace NeoIsisJob.Proxy
             return -1;
         }
 
-        public List<UserModel> GetUserFollowing(long id)
+        public async Task<List<UserModel>> GetUserFollowing(int id)
         {
-            var response = this.httpClient.GetAsync($"{id}/following").Result;
+            var client = new HttpClient();
+            var response = await client.GetAsync($"http://localhost:5261/api/user/{id}/following");
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<List<UserModel>>().Result ?? new List<UserModel>();
+                return await response.Content.ReadFromJsonAsync<List<UserModel>>() ?? new List<UserModel>();
             }
 
             Debug.WriteLine($"Failed to get following for user {id}. Status: {response.StatusCode}");
             return new List<UserModel>();
         }
 
-        public void FollowUserById(long userId, long whoToFollowId)
+        public async Task FollowUserById(int userId, int whoToFollowId)
         {
-            var response = this.httpClient.PostAsJsonAsync($"{userId}/followers", whoToFollowId).Result;
+            var client = new HttpClient();
+            var response = await client.PostAsJsonAsync($"http://localhost:5261/api/user/{userId}/followers", whoToFollowId);
             if (!response.IsSuccessStatusCode)
             {
                 Debug.WriteLine($"Failed to follow. Status: {response.StatusCode}");
             }
         }
 
-        public void UnfollowUserById(long userId, long whoToUnfollowId)
+        public async Task UnfollowUserById(int userId, int whoToUnfollowId)
         {
-            var response = this.httpClient.DeleteAsync($"{userId}/followers/{whoToUnfollowId}").Result;
+            var client = new HttpClient();
+            var response = await client.DeleteAsync($"http://localhost:5261/api/user/{userId}/followers/{whoToUnfollowId}");
             if (!response.IsSuccessStatusCode)
             {
                 Debug.WriteLine($"Failed to unfollow. Status: {response.StatusCode}");
             }
+        }
+
+        public async Task JoinGroup(int userId, long groupId)
+        {
+            var client = new HttpClient();
+
+            var response = await client.PostAsJsonAsync($"http://localhost:5261/api/user/{userId}/groups/{groupId}", string.Empty);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            throw new Exception($"Failed to join group: {response.StatusCode}");
+        }
+
+        public async Task ExitGroup(int userId, long groupId)
+        {
+            var client = new HttpClient();
+
+            var response = await client.DeleteAsync($"http://localhost:5261/api/user/{userId}/groups/{groupId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            throw new Exception($"Failed to exit group: {response.StatusCode}");
         }
     }
 }

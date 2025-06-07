@@ -5,6 +5,7 @@ namespace DesktopProject.Proxies
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Json;
+    using System.Threading.Tasks;
     using Workout.Core.IServices;
     using Workout.Core.Models;
 
@@ -19,42 +20,41 @@ namespace DesktopProject.Proxies
             this.httpClient.BaseAddress = new Uri("http://localhost:5261/api/groups/");
         }
 
-        public Group GetGroupById(long id)
+        public async Task<Group> GetGroupById(long id)
         {
-
-            var response = this.httpClient.GetAsync($"{id}").Result;
+            var response = await this.httpClient.GetAsync($"{id}");
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<Group>().Result;
+                return await response.Content.ReadFromJsonAsync<Group>();
             }
 
 
             throw new Exception($"Failed to get group: {response.StatusCode}");
         }
 
-        public List<Group> GetUserGroups(int userId)
+        public async Task<List<Group>> GetUserGroups(int userId)
         {
-            var response = this.httpClient.GetAsync($"{userId}/groups").Result;
+            var response = await this.httpClient.GetAsync($"{userId}/groups");
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<List<Group>>().Result;
+                return await response.Content.ReadFromJsonAsync<List<Group>>();
             }
             throw new Exception($"Failed to get groups: {response.StatusCode}");
         }
 
-        public List<UserModel> GetUsersFromGroup(long groupId)
+        public async Task<List<UserModel>> GetUsersFromGroup(long groupId)
         {
 
-            var response = this.httpClient.GetAsync($"{groupId}/users").Result;
+            var response = await this.httpClient.GetAsync($"{groupId}/users");
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<List<UserModel>>().Result;
+                return await response.Content.ReadFromJsonAsync<List<UserModel>>();
             }
 
             throw new Exception($"Failed to get users from group: {response.StatusCode}");
         }
 
-        public Group AddGroup(string name, string desc)
+        public async Task<Group> AddGroup(string name, string desc)
         {
             var group = new Group
             {
@@ -62,10 +62,10 @@ namespace DesktopProject.Proxies
                 Description = desc,
             };
 
-            var response = this.httpClient.PostAsJsonAsync(string.Empty, group).Result;
+            var response = await this.httpClient.PostAsJsonAsync(string.Empty, group);
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<Group>().Result;
+                return await response.Content.ReadFromJsonAsync<Group>();
             }
             throw new Exception($"Failed to add group: {response.StatusCode}");
         }
@@ -96,14 +96,13 @@ namespace DesktopProject.Proxies
         //    }
         //}
 
-        public List<Group> GetAllGroups()
+        public async Task<List<Group>> GetAllGroups()
         {
-            var response = this.httpClient.GetAsync(string.Empty).Result;
+            var response = await this.httpClient.GetAsync(string.Empty);
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<List<Group>>().Result;
+                return await response.Content.ReadFromJsonAsync<List<Group>>();
             }
-
 
             throw new Exception($"Failed to get all groups: {response.StatusCode}");
         }

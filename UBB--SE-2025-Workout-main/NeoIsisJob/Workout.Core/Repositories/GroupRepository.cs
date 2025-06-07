@@ -2,7 +2,7 @@ namespace Workout.Core.Repositories
 {
     using System.Collections.Generic;
     using System.Linq;
-    using ServerLibraryProject.DbRelationshipEntities;
+    using Microsoft.EntityFrameworkCore;
     using Workout.Core.Data;
     using Workout.Core.IRepositories;
     using Workout.Core.Models;
@@ -24,12 +24,11 @@ namespace Workout.Core.Repositories
         /// </summary>
         /// <param name="id">The ID of the group to retrieve.</param>
         /// <returns>The group with the specified ID.</returns>
-        public Group GetGroupById(long id)
+        public async Task<Group> GetGroupById(long id)
         {
             try
             {
-                return dbContext.Groups.First(g => g.Id == id);
-
+                return await dbContext.Groups.FirstOrDefaultAsync(g => g.Id == id);
             }
             catch
             {
@@ -41,9 +40,9 @@ namespace Workout.Core.Repositories
         /// Gets all groups from the Database.
         /// </summary>
         /// <returns>Returns a list of all groups.</returns>
-        public List<Group> GetAllGroups()
+        public async Task<List<Group>> GetAllGroups()
         {
-            return dbContext.Groups.ToList();
+            return await dbContext.Groups.ToListAsync();
         }
 
         /// <summary>
@@ -51,7 +50,7 @@ namespace Workout.Core.Repositories
         /// </summary>
         /// <param name="userId">The ID of the user whose groups to retrieve.</param>
         /// <returns>A list of groups the user belongs to.</returns>
-        public List<Group> GetGroupsForUser(int userId)
+        public async Task<List<Group>> GetGroupsForUser(int userId)
         {
             try
             {
@@ -61,7 +60,7 @@ namespace Workout.Core.Repositories
                                   where gud.UserId == userId
                                   select groups;
 
-                return groupsQuery.ToList();
+                return await groupsQuery.ToListAsync();
             }
             catch
             {
@@ -76,7 +75,7 @@ namespace Workout.Core.Repositories
         /// </summary>
         /// <param name="groupId">The ID of the group.</param>
         /// <returns>A list of users in the group.</returns>
-        public List<UserModel> GetUsersFromGroup(long groupId)
+        public async Task<List<UserModel>> GetUsersFromGroup(long groupId)
         {
             try
             {
@@ -86,7 +85,7 @@ namespace Workout.Core.Repositories
                                  where groupUser.GroupId == groupId
                                  select user;
 
-                return usersQuery.ToList();
+                return await usersQuery.ToListAsync();
             }
             catch
             {
@@ -99,18 +98,17 @@ namespace Workout.Core.Repositories
         /// Adds a new group in the Database.
         /// </summary>
         /// <param name="entity">The group that needs to be added.</param>
-        public void SaveGroup(Group entity)
+        public async Task SaveGroup(Group entity)
         {
             try
             {
-                dbContext.Groups.Add(entity);
-                dbContext.SaveChanges();
-            }catch
+                await dbContext.Groups.AddAsync(entity);
+                await dbContext.SaveChangesAsync();
+            }
+            catch
             {
                 throw new Exception("Group could not be saved.");
             }
-
-
         }
 
         /// <summary>

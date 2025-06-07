@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
-using ServerLibraryProject.Models;
-using Workout.Core.Models;
+﻿using Workout.Core.Models;
 
 namespace Workout.Core.IServices
 {
@@ -42,16 +34,16 @@ namespace Workout.Core.IServices
         /// </summary>
         Task<long> LoginAsync(string username, string password);
 
-        UserModel GetUserByUsername(string username);
+        Task<UserModel> GetUserByUsername(string username);
 
-        public void JoinGroup(int userId, long groupId);
+        Task JoinGroup(int userId, long groupId);
 
-        public void ExitGroup(int userId, long groupId);
+        Task ExitGroup(int userId, long groupId);
 
-        public List<UserModel> GetUserFollowing(int id);
+        Task<List<UserModel>> GetUserFollowing(int id);
 
-        void FollowUserById(int userId, int whoToFollowId);
+        Task FollowUserById(int userId, int whoToFollowId);
 
-        void UnfollowUserById(int userId, int whoToUnfollowId);
+        Task UnfollowUserById(int userId, int whoToUnfollowId);
     }
 }

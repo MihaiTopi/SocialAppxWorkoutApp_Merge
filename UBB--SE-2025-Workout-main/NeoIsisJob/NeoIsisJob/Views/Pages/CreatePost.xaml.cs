@@ -3,6 +3,7 @@ namespace DesktopProject.Pages
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using DesktopProject.Proxies;
     using DesktopProject.ViewModels;
     using global::Windows.Storage.Pickers;
@@ -41,7 +42,7 @@ namespace DesktopProject.Pages
         {
             this.TopBar.SetFrame(this.Frame);
             this.TopBar.SetCreate();
-            this.LoadUserGroups();
+            _ = this.LoadUserGroups();
             this.InitializeVisibilityOptions();
         }
 
@@ -52,14 +53,14 @@ namespace DesktopProject.Pages
             this.groupService = new GroupServiceProxy();
         }
 
-        private void LoadUserGroups()
+        private async Task LoadUserGroups()
         {
             if (AppController.CurrentUser == null)
             {
                 throw new InvalidOperationException("CurrentUser is not set in the AppController.");
             }
 
-            this.userGroups = this.groupService.GetUserGroups(AppController.CurrentUser.ID);
+            this.userGroups = await this.groupService.GetUserGroups(AppController.CurrentUser.ID);
             this.GroupsListBox.ItemsSource = this.userGroups;
         }
 
@@ -122,7 +123,7 @@ namespace DesktopProject.Pages
             this.Frame.GoBack();
         }
 
-        private void PostButton_Click(object sender, RoutedEventArgs e)
+        private async void PostButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -130,7 +131,7 @@ namespace DesktopProject.Pages
                 var selectedVisibility = (PostVisibility)this.VisibilityComboBox.SelectedItem;
                 var post = this.CreateNewPost(selectedVisibility);
 
-                this.postViewModel.AddPost(
+                await this.postViewModel.AddPost(
                     post.Title,
                     post.Content,
                     post.UserId,

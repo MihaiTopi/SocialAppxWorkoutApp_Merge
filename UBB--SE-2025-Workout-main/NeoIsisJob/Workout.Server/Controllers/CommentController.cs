@@ -16,9 +16,9 @@
         }
 
         [HttpGet]
-        public ActionResult<List<Comment>> GetAllComments()
+        public async Task<ActionResult<List<Comment>>> GetAllComments()
         {
-            var comments = this.commentService.GetAllComments();
+            var comments = await this.commentService.GetAllComments();
             return this.Ok(comments);
         }
 
@@ -35,14 +35,14 @@
         //}
 
         [HttpPost]
-        public IActionResult SaveComment([FromBody] Comment comment)
+        public async Task<IActionResult> SaveComment([FromBody] Comment comment)
         {
             if (comment == null)
             {
                 return this.BadRequest("Comment cannot be null.");
             }
 
-            return this.Ok(this.commentService.AddComment(comment.Content, comment.UserId, comment.PostId));
+            return this.Ok(await this.commentService.AddComment(comment.Content, comment.UserId, comment.PostId));
         }
     }
 }

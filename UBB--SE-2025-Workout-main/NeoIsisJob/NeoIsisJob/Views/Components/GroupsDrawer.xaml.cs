@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using DesktopProject.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI;
@@ -7,6 +8,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using NeoIsisJob;
+using NeoIsisJob.Proxy;
 using Workout.Core.IServices;
 
 namespace DesktopProject.Components
@@ -15,7 +17,7 @@ namespace DesktopProject.Components
     {
         private IGroupService groupService;
         private Frame navigationFrame;
-        private IUserService userService;
+        private UserServiceProxy userService;
         public Frame NavigationFrame
         {
             get => navigationFrame;
@@ -26,17 +28,17 @@ namespace DesktopProject.Components
         {
             this.InitializeComponent();
             groupService = App.Services.GetService<IGroupService>();
-            userService = App.Services.GetService<IUserService>();
+            userService = new UserServiceProxy();
             CreateGroupButton.Click += CreateGroup_Click;
-            LoadGroups();
+            _ = LoadGroups();
         }
 
-        private void LoadGroups()
+        private async Task LoadGroups()
         {
             GroupsList.Children.Clear();
 
-            var groups = groupService.GetAllGroups();
-            var userGroups = groupService.GetUserGroups(AppController.CurrentUser.ID);
+            var groups = await groupService.GetAllGroups();
+            var userGroups = await groupService.GetUserGroups(AppController.CurrentUser.ID);
             var userGroupIds = userGroups.Select(g => g.Id).ToHashSet(); // Fast lookup
 
             foreach (var group in groups)
@@ -101,43 +103,48 @@ namespace DesktopProject.Components
             }
         }
 
-
         private void JoinGroup_Click(object sender, RoutedEventArgs e)
+        {
+            _ = JoinGroupAsync(sender, e);
+        }
+
+        private async Task JoinGroupAsync(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
             long groupId = (long)button.Tag;
             try
             {
-                userService.JoinGroup(AppController.CurrentUser.ID, groupId);
+                await this.userService.JoinGroup(AppController.CurrentUser.ID, groupId);
             }
             catch (Exception ex)
             {
-                // Handle the exception (e.g., show a message to the user)
-                // For now, we can just log it or show a message box
                 System.Diagnostics.Debug.WriteLine($"Error joining group: {ex.Message}");
                 return;
             }
 
-            LoadGroups(); // Refresh UI
+            await this.LoadGroups(); // Refresh UI
         }
 
         private void ExitGroup_Click(object sender, RoutedEventArgs e)
+        {
+            _ = ExitGroupAsync(sender, e);
+        }
+
+        private async Task ExitGroupAsync(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
             long groupId = (long)button.Tag;
             try
             {
-                userService.ExitGroup(AppController.CurrentUser.ID, groupId);
+                await this.userService.ExitGroup(AppController.CurrentUser.ID, groupId);
             }
             catch (Exception ex)
             {
-                // Handle the exception (e.g., show a message to the user)
-                // For now, we can just log it or show a message box
                 System.Diagnostics.Debug.WriteLine($"Error exiting group: {ex.Message}");
                 return;
             }
 
-            LoadGroups(); // Refresh UI
+            await this.LoadGroups(); // Refresh UI
         }
 
 

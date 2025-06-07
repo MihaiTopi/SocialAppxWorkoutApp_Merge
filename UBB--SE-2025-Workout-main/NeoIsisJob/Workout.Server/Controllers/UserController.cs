@@ -81,16 +81,85 @@ namespace Workout.Server.Controllers
         }
 
         [HttpGet("user")]
-        public ActionResult<UserModel> GetUserByUsername([FromQuery] string username)
+        public async Task<ActionResult<UserModel>> GetUserByUsername([FromQuery] string username)
         {
             try
             {
-                return this.userService.GetUserByUsername(username);
+                return this.Ok(await this.userService.GetUserByUsername(username));
             }
             catch (Exception e)
             {
                 return this.BadRequest(e.Message);
             }
+        }
+
+        [HttpPost("{userId}/followers")]
+        public async Task<IActionResult> FollowUser(int userId, [FromBody] int followerId)
+        {
+            try
+            {
+                await this.userService.FollowUserById(userId, followerId);
+                return this.Ok();
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("{userId}/followers/{unfollowUserId}")]
+        public async Task<IActionResult> UnfollowUser(int userId, int unfollowUserId)
+        {
+            try
+            {
+                await this.userService.UnfollowUserById(userId, unfollowUserId);
+                return this.Ok();
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(e.Message);
+            }
+        }
+        // Add these endpoints inside the UserController class
+
+        /// <summary>
+        /// Adds the user to a group.
+        /// </summary>
+        [HttpPost("{userId}/groups/{groupId}")]
+        public async Task<IActionResult> JoinGroup(int userId, long groupId)
+        {
+            try
+            {
+                await this.userService.JoinGroup(userId, groupId);
+                return this.Ok();
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Removes the user from a group.
+        /// </summary>
+        [HttpDelete("{userId}/groups/{groupId}")]
+        public async Task<IActionResult> ExitGroup(int userId, long groupId)
+        {
+            try
+            {
+                await this.userService.ExitGroup(userId, groupId);
+                return this.Ok();
+            }
+            catch (Exception e)
+            {
+                return this.BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("{userId}/following")]
+        public async Task<ActionResult<List<UserModel>>> GetUserFollowing(int userId)
+        {
+            return await this.userService.GetUserFollowing(userId);
         }
     }
 }

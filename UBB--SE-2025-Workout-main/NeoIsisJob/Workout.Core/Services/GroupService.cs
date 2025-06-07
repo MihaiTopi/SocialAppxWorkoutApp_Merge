@@ -15,22 +15,22 @@ namespace Workout.Core.Services
             this.userRepository = userRepository;
         }
 
-        public Group GetGroupById(long id)
+        public async Task<Group> GetGroupById(long id)
         {
-            return this.groupRepository.GetGroupById(id);
+            return await this.groupRepository.GetGroupById(id);
         }
 
-        public List<Group> GetUserGroups(int userId)
+        public async Task<List<Group>> GetUserGroups(int userId)
         {
-            return this.groupRepository.GetGroupsForUser(userId);
+            return await this.groupRepository.GetGroupsForUser(userId);
         }
 
-        public List<UserModel> GetUsersFromGroup(long groupId)
+        public async Task<List<UserModel>> GetUsersFromGroup(long groupId)
         {
-            return this.groupRepository.GetUsersFromGroup(groupId);
+            return await this.groupRepository.GetUsersFromGroup(groupId);
         }
 
-        public Group AddGroup(string name, string desc)
+        public async Task<Group> AddGroup(string name, string desc)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -43,7 +43,7 @@ namespace Workout.Core.Services
                 Description = desc,
             };
 
-            this.groupRepository.SaveGroup(group);
+            await this.groupRepository.SaveGroup(group);
             return group;
         }
 
@@ -85,9 +85,9 @@ namespace Workout.Core.Services
         //    }
         //}
 
-        public List<Group> GetAllGroups()
+        public async Task<List<Group>> GetAllGroups()
         {
-            return this.groupRepository.GetAllGroups();
+            return await this.groupRepository.GetAllGroups();
         }
     }
 }

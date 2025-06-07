@@ -23,7 +23,7 @@ namespace ServerMVCProject.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             try
             {
@@ -31,7 +31,7 @@ namespace ServerMVCProject.Controllers
 
                 int userId = int.Parse(userIdStr);
 
-                List<Post> posts = this.postService.GetPostsHomeFeed(userId);
+                List<Post> posts = await this.postService.GetPostsHomeFeed(userId);
                 return this.View(posts);
             }
             catch (Exception ex)
@@ -44,7 +44,7 @@ namespace ServerMVCProject.Controllers
 
         [HttpPost("react")]
         [AuthorizeUser]
-        public JsonResult ReactAjax(long postId, string type)
+        public async Task<JsonResult> ReactAjax(long postId, string type)
         {
             try
             {
@@ -55,21 +55,21 @@ namespace ServerMVCProject.Controllers
                 if (!Enum.TryParse<ReactionType>(type, out var reactionType))
                     return Json(new { success = false, error = "Invalid reaction type" });
 
-                var existing = reactionRepository.GetReaction(userId, postId);
+                var existing = await reactionRepository.GetReaction(userId, postId);
                 if (existing == null)
                 {
-                    reactionRepository.Add(new Reaction { UserId = userId, PostId = postId, Type = reactionType });
+                    await reactionRepository.Add(new Reaction { UserId = userId, PostId = postId, Type = reactionType });
                 }
                 else if (existing.Type == reactionType)
                 {
-                    reactionRepository.Delete(userId, postId);
+                    await reactionRepository.Delete(userId, postId);
                 }
                 else
                 {
-                    reactionRepository.Update(userId, postId, reactionType);
+                    await reactionRepository.Update(userId, postId, reactionType);
                 }
 
-                var reactions = reactionRepository.GetReactionsByPostId(postId);
+                var reactions = await reactionRepository.GetReactionsByPostId(postId);
                 return Json(new
                 {
                     success = true,

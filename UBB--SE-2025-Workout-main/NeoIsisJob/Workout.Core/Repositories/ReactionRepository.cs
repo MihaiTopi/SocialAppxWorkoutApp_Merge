@@ -2,6 +2,7 @@ namespace ServerLibraryProject.Repositories
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Microsoft.EntityFrameworkCore;
     using Workout.Core.Data;
     using Workout.Core.Enums;
     using Workout.Core.IRepositories;
@@ -25,17 +26,17 @@ namespace ServerLibraryProject.Repositories
         /// </summary>
         /// <param name="userId">The ID of the user.</param>
         /// <param name="postId">The ID of the post.</param>
-        public void Delete(int userId, long postId)
+        public async Task Delete(int userId, long postId)
         {
             try
             {
-                var reactionDeleted = (from reaction in dbContext.Reactions
-                                       where reaction.PostId == postId && reaction.UserId == userId
-                                       select reaction).FirstOrDefault();
+                var reactionDeleted = await (from reaction in dbContext.Reactions
+                                             where reaction.PostId == postId && reaction.UserId == userId
+                                             select reaction).FirstOrDefaultAsync();
                 if (reactionDeleted != null)
                 {
                     dbContext.Remove(reactionDeleted);
-                    dbContext.SaveChanges();
+                    await dbContext.SaveChangesAsync();
                 }
             }
             catch
@@ -59,13 +60,13 @@ namespace ServerLibraryProject.Repositories
         /// </summary>
         /// <param name="postId">The ID of the post.</param>
         /// <returns>A list of reactions for the specified post.</returns>
-        public List<Reaction> GetReactionsByPostId(long postId)
+        public Task<List<Reaction>> GetReactionsByPostId(long postId)
         {
             var reactionsQuery = from reaction in dbContext.Reactions
                                  where reaction.PostId == postId
                                  select reaction;
 
-            return reactionsQuery.ToList();
+            return reactionsQuery.ToListAsync();
         }
 
         /// <summary>
@@ -74,13 +75,13 @@ namespace ServerLibraryProject.Repositories
         /// <param name="userId">The ID of the user.</param>
         /// <param name="postId">The ID of the post.</param>
         /// <returns>The reaction for the specified user and post.</returns>
-        public Reaction GetReaction(int userId, long postId)
+        public async Task<Reaction> GetReaction(int userId, long postId)
         {
             try
             {
-                var reactionReturned = (from reaction in dbContext.Reactions
-                                        where reaction.PostId == postId && reaction.UserId == userId
-                                        select reaction).FirstOrDefault();
+                var reactionReturned = await (from reaction in dbContext.Reactions
+                                              where reaction.PostId == postId && reaction.UserId == userId
+                                              select reaction).FirstOrDefaultAsync();
                 return reactionReturned;
             }
             catch
@@ -94,13 +95,14 @@ namespace ServerLibraryProject.Repositories
         /// Saves a new reaction to the repository.
         /// </summary>
         /// <param name="entity">The reaction entity to save.</param>
-        public void Add(Reaction entity)
+        public async Task Add(Reaction entity)
         {
             try
             {
-                dbContext.Reactions.Add(entity);
-                dbContext.SaveChanges();
-            }catch
+                await dbContext.Reactions.AddAsync(entity);
+                await dbContext.SaveChangesAsync();
+            }
+            catch
             {
                 throw new Exception("Error saving the reaction");
             }
@@ -112,16 +114,16 @@ namespace ServerLibraryProject.Repositories
         /// <param name="userId">The ID of the user.</param>
         /// <param name="postId">The ID of the post.</param>
         /// <param name="type">The new reaction type.</param>
-        public void Update(int userId, long postId, ReactionType type)
+        public async Task Update(int userId, long postId, ReactionType type)
         {
             try
             {
-                var reaction = dbContext.Reactions.FirstOrDefault(r => r.PostId == postId && r.UserId == userId);
+                var reaction = await dbContext.Reactions.FirstOrDefaultAsync(r => r.PostId == postId && r.UserId == userId);
 
                 if (reaction != null)
                 {
                     reaction.Type = type;
-                    dbContext.SaveChanges();
+                    await dbContext.SaveChangesAsync();
                 }
             }
             catch

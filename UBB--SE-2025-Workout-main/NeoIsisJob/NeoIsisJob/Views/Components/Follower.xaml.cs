@@ -1,6 +1,7 @@
 namespace DesktopProject.Components
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using DesktopProject.Proxies;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.UI.Xaml;
@@ -32,6 +33,8 @@ namespace DesktopProject.Components
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Follower"/> class.
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Follower"/> class.
         /// </summary>
         /// <param name="username">The username of the follower.</param>
         /// <param name="isFollowing">Indicates whether the current user is following this user.</param>
@@ -48,17 +51,26 @@ namespace DesktopProject.Components
             this.user = user;
             this.navigationFrame = frame ?? Window.Current.Content as Frame; // Fallback to app-level Frame if not provided
             this.Name.Text = username;
-            this.Button.Content = this.IsFollowed() ? "Unfollow" : "Follow";
-            this.PointerPressed += this.Follower_Click; // Add click event to the entire control
+
+            // Update the button content asynchronously after initialization
+            this.InitializeButtonContentAsync();
+        }
+
+        /// <summary>
+        /// Asynchronously initializes the button content based on the follow status.
+        /// </summary>
+        private async void InitializeButtonContentAsync()
+        {
+            this.Button.Content = await this.IsFollowed() ? "Unfollow" : "Follow";
         }
 
         /// <summary>
         /// Determines whether the current user is following this user.
         /// </summary>
         /// <returns>True if the user is followed; otherwise, false.</returns>
-        private bool IsFollowed()
+        private async Task<bool> IsFollowed()
         {
-            List<UserModel> following = this.userServiceProxy.GetUserFollowing(AppController.CurrentUser.ID);
+            List<UserModel> following = await this.userServiceProxy.GetUserFollowing(AppController.CurrentUser.ID);
             foreach (UserModel user in following)
             {
                 if (user.ID == this.user.ID)
@@ -84,16 +96,16 @@ namespace DesktopProject.Components
         /// <summary>
         /// Handles the click event for the follow/unfollow button.
         /// </summary>
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Button.Content = this.Button.Content.ToString() == "Follow" ? "Unfollow" : "Follow";
-            if (!this.IsFollowed())
+            if (await this.IsFollowed())
             {
-                this.userServiceProxy.FollowUserById(AppController.CurrentUser.ID, this.user.ID);
+                await this.userServiceProxy.FollowUserById(AppController.CurrentUser.ID, this.user.ID);
             }
             else
             {
-                this.userServiceProxy.UnfollowUserById(AppController.CurrentUser.ID, user.ID);
+                await this.userServiceProxy.UnfollowUserById(AppController.CurrentUser.ID, user.ID);
             }
         }
     }

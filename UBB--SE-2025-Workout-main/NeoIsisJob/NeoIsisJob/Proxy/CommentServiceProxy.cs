@@ -4,6 +4,7 @@ namespace NeoIsisJob.Proxy
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Json;
+    using System.Threading.Tasks;
     using ServerLibraryProject.Models;
     using Workout.Core.IServices;
 
@@ -23,7 +24,7 @@ namespace NeoIsisJob.Proxy
         /// <summary>
         /// Adds a new comment.
         /// </summary>
-        public Comment AddComment(string content, int userId, long postId)
+        public async Task<Comment> AddComment(string content, int userId, long postId)
         {
             var comment = new Comment
             {
@@ -34,10 +35,10 @@ namespace NeoIsisJob.Proxy
                 CreatedDate = DateTime.UtcNow,
             };
 
-            var response = httpClient.PostAsJsonAsync(string.Empty, comment).Result;
+            var response = await httpClient.PostAsJsonAsync(string.Empty, comment);
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<Comment>().Result;
+                return await response.Content.ReadFromJsonAsync<Comment>();
             }
             throw new Exception($"Failed to add comment: {response.StatusCode}");
         }
@@ -55,12 +56,12 @@ namespace NeoIsisJob.Proxy
         /// <summary>
         /// Retrieves all comments.
         /// </summary>
-        public List<Comment> GetAllComments()
+        public async Task<List<Comment>> GetAllComments()
         {
-            var response = httpClient.GetAsync("").Result;
+            var response = await this.httpClient.GetAsync(string.Empty);
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<List<Comment>>().Result;
+                return await response.Content.ReadFromJsonAsync<List<Comment>>();
             }
             throw new Exception($"Failed to get comments: {response.StatusCode}");
         }
@@ -77,13 +78,13 @@ namespace NeoIsisJob.Proxy
         /// <summary>
         /// Retrieves all comments for a specific post.
         /// </summary>
-        public List<Comment> GetCommentsByPostId(long postId)
+        public async Task<List<Comment>> GetCommentsByPostId(long postId)
         {
             var client = new HttpClient();
-            var response = client.GetAsync($"https://localhost:7106/api/posts/{postId}/comments").Result;
+            var response = await client.GetAsync($"http://localhost:5261/api/posts/{postId}/comments");
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<List<Comment>>().Result;
+                return await response.Content.ReadFromJsonAsync<List<Comment>>();
             }
             throw new Exception($"Failed to get comments: {response.StatusCode}");
 

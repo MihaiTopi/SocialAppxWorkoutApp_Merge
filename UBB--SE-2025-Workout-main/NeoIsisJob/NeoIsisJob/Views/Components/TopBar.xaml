@@ -9,17 +9,25 @@
     d:DesignHeight="60"
     d:DesignWidth="800">
 
-    <Grid Background="#fff" Padding="20" MinHeight="40" BorderBrush="#e5e7eb" BorderThickness="0,0,0,1">
+    <Grid Background="#393E46" Padding="20" MinHeight="40">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*" MinWidth="400"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-        <Border x:Name="Logo" Grid.Column="0" Width="40" Height="40" CornerRadius="20" HorizontalAlignment="Left" Background="Transparent">
-            <Image Source="../Assets/Logo.png" Stretch="UniformToFill"/>
+        <Border 
+            x:Name="Logo"
+            Grid.Column="0"
+            Width="40" 
+            Height="40" 
+            CornerRadius="20"
+            HorizontalAlignment="Left"
+            Background="Red">
+            <Image 
+                Source="../Assets/Logo.png" 
+                Stretch="UniformToFill"/>
         </Border>
 
         <Grid Grid.Column="1" Padding="100 0 100 0">
@@ -28,12 +36,56 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="GroupsButton" Content="Groups" FontSize="20" Foreground="#fff" Background="#2563eb" BorderThickness="0" CornerRadius="8" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoe UI" Grid.Column="0" Padding="12,6" Margin="0,0,12,0" />
-            <Button x:Name="SeeUsersButton" Content="See Users" FontSize="20" Foreground="#fff" Background="#2563eb" BorderThickness="0" CornerRadius="8" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoe UI" Grid.Column="1" Padding="12,6" Margin="0,0,12,0" />
-            <Button x:Name="CreatePostButton" Content="Create Post" FontSize="20" Foreground="#fff" Background="#2563eb" BorderThickness="0" CornerRadius="8" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoe UI" Grid.Column="2" Padding="12,6" Margin="0,0,12,0" />
+            <Button 
+        x:Name="HomeButton"
+        Content="Home" 
+        FontSize="24" 
+        Foreground="#EEEEEE" 
+        Background="#393E46"
+        BorderThickness="0"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        FontFamily="Segoe Script"
+        Grid.Column="0"/>
+
+            <Button 
+        x:Name="CreatePostButton"
+        Content="Create Post" 
+        FontSize="24" 
+        Foreground="#EEEEEE" 
+        Background="#393E46"
+        BorderThickness="0"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        FontFamily="Segoe Script"
+        Grid.Column="1"/>
+
+            <Button 
+        x:Name="SeeUsersButton"
+        Content="See Users" 
+        FontSize="24" 
+        Foreground="#EEEEEE" 
+        Background="#393E46"
+        BorderThickness="0"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        FontFamily="Segoe Script"
+        Grid.Column="2"/>
+
+            <Button 
+        x:Name="GroupsButton"
+        Content="Groups" 
+        FontSize="24" 
+        Foreground="#EEEEEE" 
+        Background="#393E46"
+        BorderThickness="0"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        FontFamily="Segoe Script"
+        Grid.Column="3"/>
         </Grid>
+        
     </Grid>
 </UserControl>

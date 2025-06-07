@@ -15,26 +15,24 @@
             this.reactionRepository = reactionRepository;
         }
 
-        public void AddReaction(Reaction reaction)
+        public async Task AddReaction(Reaction reaction)
         {
             try
             {
-                Reaction oldReaction = reactionRepository.GetReaction(reaction.UserId, reaction.PostId);
+                Reaction oldReaction = await this.reactionRepository.GetReaction(reaction.UserId, reaction.PostId);
                 if (oldReaction.Type == reaction.Type)
                 {
-                    reactionRepository.Delete(reaction.UserId, reaction.PostId);
+                    await this.reactionRepository.Delete(reaction.UserId, reaction.PostId);
                 }
                 else
                 {
-                    reactionRepository.Update(reaction.UserId, reaction.PostId, reaction.Type);
+                    await this.reactionRepository.Update(reaction.UserId, reaction.PostId, reaction.Type);
                 }
-
             }
             catch (Exception ex)
             {
-                this.reactionRepository.Add(reaction);
+                await this.reactionRepository.Add(reaction);
             }
-
         }
 
 
@@ -51,14 +49,14 @@
         //    return reactionRepository.GetAllReactions();
         //}
 
-        public List<Reaction> GetReactionsByPostId(long postId)
+        public async Task<List<Reaction>> GetReactionsByPostId(long postId)
         {
-            return reactionRepository.GetReactionsByPostId(postId);
+            return await reactionRepository.GetReactionsByPostId(postId);
         }
 
-        public Reaction GetReaction(int userId, long postId)
+        public async Task<Reaction> GetReaction(int userId, long postId)
         {
-            return this.reactionRepository.GetReaction(userId, postId);
+            return await this.reactionRepository.GetReaction(userId, postId);
         }
 
         //public void UpdateReaction(Reaction reaction)

@@ -1,4 +1,4 @@
-﻿namespace NeoIsisJob.Services
+﻿/*namespace NeoIsisJob.Services
 {
     using DesktopProject.Proxies;
     using NeoIsisJob.Proxy;
@@ -37,4 +37,4 @@
             return createdUser == null ? -1 : createdUser;
         }
     }
-}
+}*/

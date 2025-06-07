@@ -32,13 +32,13 @@ namespace Workout.Web.Controllers
         }
 
         [HttpPost("Register")]
-        public IActionResult Register([FromForm] AuthenticationModel user)
+        public async Task<IActionResult> Register([FromForm] AuthenticationModel user)
         {
             try
             {
                 if (user.Username != null && user.Password != null)
                 {
-                    long result = this._userService.AddUserAsync(user.Username, string.Empty, user.Password).Result;
+                    int result = await this._userService.AddUserAsync(user.Username, string.Empty, user.Password);
 
                     this.HttpContext.Session.SetString("UserId", result.ToString());
 
@@ -61,7 +61,7 @@ namespace Workout.Web.Controllers
         }
 
         [HttpPost("Login")]
-        public IActionResult Login([FromForm] AuthenticationModel user)
+        public async Task<IActionResult> Login([FromForm] AuthenticationModel user)
         {
             try
             {
@@ -70,7 +70,7 @@ namespace Workout.Web.Controllers
                     try
                     {
 
-                        UserModel findUser = this._userService.GetUserByUsername(user.Username);
+                        UserModel findUser = await this._userService.GetUserByUsername(user.Username);
                         if (findUser.Password.Equals(user.Password))
                         {
                             this.HttpContext.Session.SetString("UserId", findUser.ID.ToString());
@@ -122,18 +122,20 @@ namespace Workout.Web.Controllers
         }
 
         [HttpGet("Follow")]
-        public IActionResult Follow(string search = "")
+        public async Task<IActionResult> Follow(string search = "")
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
 
             int userId = int.Parse(userIdStr);
-            var allUsers = _userService.GetAllUsersAsync().Result
+            var allUsers = (await _userService.GetAllUsersAsync())
                 .Where(u => u.ID != userId &&
                             u.Username.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
-            var following = _userService.GetUserFollowing(userId).Select(u => u.ID).ToHashSet();
+            var following = (await _userService.GetUserFollowing(userId))
+                .Select(u => u.ID)
+                .ToHashSet();
 
             ViewData["Following"] = following;
             ViewData["CurrentUserId"] = userId;
@@ -143,7 +145,7 @@ namespace Workout.Web.Controllers
         }
 
         [HttpPost("FollowToggle/{targetId}")]
-        public IActionResult FollowToggle(int targetId)
+        public async Task<IActionResult> FollowToggle(int targetId)
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
@@ -151,13 +153,13 @@ namespace Workout.Web.Controllers
             int userId = int.Parse(userIdStr);
             var following = _userService.GetUserFollowing(userId);
 
-            bool isFollowing = following.Any(u => u.ID == targetId);
+            bool isFollowing = (await following).Any(u => u.ID == targetId);
             try
             {
                 if (isFollowing)
-                    _userService.UnfollowUserById(userId, targetId);
+                    await _userService.UnfollowUserById(userId, targetId);
                 else
-                    _userService.FollowUserById(userId, targetId);
+                    await _userService.FollowUserById(userId, targetId);
             }
             catch (Exception ex)
             {

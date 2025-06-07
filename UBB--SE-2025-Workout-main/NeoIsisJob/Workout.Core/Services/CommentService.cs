@@ -36,14 +36,14 @@ namespace ServerLibraryProject.Services
         /// <param name="userId">The ID of the user adding the comment.</param>
         /// <param name="postId">The ID of the post to which the comment is added.</param>
         /// <returns>The created Comment object.</returns>
-        public Comment AddComment(string content, int userId, long postId)
+        public async Task<Comment> AddComment(string content, int userId, long postId)
         {
             if (content == null || content.Length == 0)
             {
                 throw new ArgumentException("Comment content cannot be empty or null.", nameof(content));
             }
 
-            if (this.userServiceProxy.GetUserByIdAsync(userId).Result == null)
+            if (await this.userServiceProxy.GetUserByIdAsync(userId) == null)
             {
                 throw new InvalidOperationException($"User with ID {userId} does not exist.");
             }
@@ -61,7 +61,7 @@ namespace ServerLibraryProject.Services
                 CreatedDate = DateTime.Now,
             };
 
-            this.commentRepository.SaveComment(comment);
+            await this.commentRepository.SaveComment(comment);
 
             return comment;
         }
@@ -107,9 +107,9 @@ namespace ServerLibraryProject.Services
         /// Gets all comments.
         /// </summary>
         /// <returns> A list of all the comments.</returns>
-        public List<Comment> GetAllComments()
+        public async Task<List<Comment>> GetAllComments()
         {
-            return this.commentRepository.GetAllComments();
+            return await this.commentRepository.GetAllComments();
         }
 
         /// <summary>
@@ -127,9 +127,9 @@ namespace ServerLibraryProject.Services
         /// </summary>
         /// <param name="postId">The ID of the post which the comments are retrieved from.</param>
         /// <returns>A list of comments specified by the post.</returns>
-        public List<Comment> GetCommentsByPostId(long postId)
+        public async Task<List<Comment>> GetCommentsByPostId(long postId)
         {
-            return this.commentRepository.GetCommentsByPostId(postId);
+            return await this.commentRepository.GetCommentsByPostId(postId);
         }
     }
 }

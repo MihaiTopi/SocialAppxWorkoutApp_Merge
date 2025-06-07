@@ -44,7 +44,7 @@
     <tbody>
         @foreach (var group in Model)
         {
-			bool isInGroup = userId.HasValue && groupService.GetUserGroups(userId.Value).Any(g => g.Id == group.Id);
+			bool isInGroup = userId.HasValue && (await groupService.GetUserGroups(userId.Value)).Any(g => g.Id == group.Id);
             <tr>
                 <td>@group.Name</td>
                 <td>@group.Description</td>

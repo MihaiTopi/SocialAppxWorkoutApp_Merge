@@ -1,4 +1,5 @@
-﻿using ServerLibraryProject.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using ServerLibraryProject.Interfaces;
 using Workout.Core.Data;
 using Workout.Core.Enums;
 using Workout.Core.Models;
@@ -17,11 +18,11 @@ namespace ServerLibraryProject.Repositories
             this.dbContext = context;
         }
 
-        public Post GetPostById(long postId)
+        public async Task<Post> GetPostById(long postId)
         {
             try
             {
-                return dbContext.Posts.FirstOrDefault(p => p.Id == postId);
+                return await dbContext.Posts.FirstOrDefaultAsync(p => p.Id == postId);
             }
             catch
             {
@@ -29,17 +30,17 @@ namespace ServerLibraryProject.Repositories
             }
         }
 
-        public List<Post> GetAllPosts()
+        public async Task<List<Post>> GetAllPosts()
         {
-            return dbContext.Posts.ToList();
+            return await dbContext.Posts.ToListAsync();
         }
 
-        public void SavePost(Post entity)
+        public async Task SavePost(Post entity)
         {
             try
             {
-                this.dbContext.Posts.Add(entity);
-                this.dbContext.SaveChanges();
+                await this.dbContext.Posts.AddAsync(entity);
+                await this.dbContext.SaveChangesAsync();
             }
             catch
             {
@@ -76,10 +77,10 @@ namespace ServerLibraryProject.Repositories
         //    return false;
         //}
 
-        public List<Post> GetPostsHomeFeed(int userId)
+        public async Task<List<Post>> GetPostsHomeFeed(int userId)
         {
             var postsQuery = from post in dbContext.Posts
-                             where post.UserId == userId
+                             where (post.UserId == userId && post.Visibility == PostVisibility.Private)
                                 || post.Visibility == PostVisibility.Public
                                 || dbContext.UserFollowers.Any(userFollower =>
                                     userFollower.UserId == post.UserId
@@ -89,11 +90,10 @@ namespace ServerLibraryProject.Repositories
                              orderby post.CreatedDate descending
                              select post;
 
-
-            return postsQuery.ToList();
+            return await postsQuery.ToListAsync();
         }
 
-        public List<Post> GetPostsGroupsFeed(int userId)
+        public async Task<List<Post>> GetPostsGroupsFeed(int userId)
         {
             var postsQuery = from post in dbContext.Posts
                              where dbContext.GroupUsers.Any(groupUser =>
@@ -101,23 +101,23 @@ namespace ServerLibraryProject.Repositories
                              orderby post.CreatedDate descending
                              select post;
 
-            return postsQuery.ToList();
+            return await postsQuery.ToListAsync();
         }
 
-        public List<Post> GetPostsByUserId(int userId)
+        public async Task<List<Post>> GetPostsByUserId(int userId)
         {
-            return dbContext.Posts
+            return await this.dbContext.Posts
                 .Where(p => p.UserId == userId)
                 .OrderByDescending(p => p.CreatedDate)
-                .ToList();
+                .ToListAsync();
         }
 
-        public List<Post> GetPostsByGroupId(long groupId)
+        public async Task<List<Post>> GetPostsByGroupId(long groupId)
         {
-            return dbContext.Posts
+            return await this.dbContext.Posts
                 .Where(p => p.GroupId == groupId)
                 .OrderByDescending(p => p.CreatedDate)
-                .ToList();
+                .ToListAsync();
         }
 
     }

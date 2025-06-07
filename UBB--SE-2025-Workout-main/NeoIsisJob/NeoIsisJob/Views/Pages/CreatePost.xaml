@@ -22,37 +22,73 @@
         <components:TopBar Grid.Row="0" x:Name="TopBar"/>
 
         <!-- Scrollable Main Content -->
-        <ScrollViewer Grid.Row="1" VerticalScrollMode="Auto" VerticalScrollBarVisibility="Auto">
-            <Grid Margin="40,20,40,20">
+        <ScrollViewer Grid.Row="1" 
+                   VerticalScrollMode="Auto"
+                   VerticalScrollBarVisibility="Auto">
+            <Grid Margin="40 20">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" MinWidth="150"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition MinWidth="800"/>
                     <ColumnDefinition Width="Auto" MinWidth="150"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Form Container (updated to white background) -->
-                <Border Grid.Column="1" Background="#fff" CornerRadius="16" Padding="40,32,40,32" HorizontalAlignment="Center" VerticalAlignment="Top" MaxWidth="700">
+                <!-- Form Container -->
+                <Border Grid.Column="1" 
+                     Background="#393E46" 
+                     CornerRadius="10"
+                     Padding="30"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Top"
+                     MaxWidth="700">
+
                     <StackPanel Spacing="20">
                         <!-- Title Section -->
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Post Title" Foreground="#2563eb" FontSize="20" FontWeight="SemiBold"/>
-                            <TextBox x:Name="TitleInput" PlaceholderText="Enter your post title..." MaxLength="50" FontSize="16" Background="#f3f4f6" Foreground="Black" BorderThickness="0" CornerRadius="8" Margin="0,6,0,0" Padding="12"/>
-                            <TextBlock x:Name="TitleCharCounter" Text="0/50" Foreground="#6b7280" HorizontalAlignment="Right"/>
+                            <TextBlock Text="Post Title" Foreground="#00ADB5" FontSize="16"/>
+                            <TextBox x:Name="TitleInput" 
+                                  PlaceholderText="Enter your post title..."
+                                  MaxLength="50"
+                                  FontSize="14"
+                                  Background="#D9D9D9"
+                                  Foreground="Black"
+                                  BorderThickness="0"
+                                  CornerRadius="5"/>
+                            <TextBlock x:Name="TitleCharCounter" 
+                                    Text="0/50" 
+                                    Foreground="Gray" 
+                                    HorizontalAlignment="Right"/>
                         </StackPanel>
 
                         <!-- Content Section -->
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Description" Foreground="#2563eb" FontSize="20" FontWeight="SemiBold"/>
-                            <TextBox x:Name="DescriptionInput" PlaceholderText="Write your post description..." AcceptsReturn="True" TextWrapping="Wrap" MaxLength="250" FontSize="16" Background="#f3f4f6" Foreground="Black" BorderThickness="0" CornerRadius="8" Margin="0,6,0,0" Padding="12" MinHeight="150"/>
-                            <TextBlock x:Name="DescriptionCharCounter" Text="0/250" Foreground="#6b7280" HorizontalAlignment="Right"/>
+                            <TextBlock Text="Description" Foreground="#00ADB5" FontSize="16"/>
+                            <TextBox x:Name="DescriptionInput" 
+                                  PlaceholderText="Write your post description..."
+                                  AcceptsReturn="True"
+                                  TextWrapping="Wrap"
+                                  MaxLength="250"
+                                  FontSize="14"
+                                  Background="#D9D9D9"
+                                  Foreground="Black"
+                                  BorderThickness="0"
+                                  CornerRadius="5"
+                                  MinHeight="150"/>
+                            <TextBlock x:Name="DescriptionCharCounter" 
+                                    Text="0/250" 
+                                    Foreground="Gray" 
+                                    HorizontalAlignment="Right"/>
                         </StackPanel>
 
                         <TextBlock x:Name="Confirmation"/>
 
                         <!-- Visibility Selection -->
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Visibility" Foreground="#2563eb" FontSize="20" FontWeight="SemiBold"/>
-                            <ComboBox x:Name="VisibilityComboBox" Background="#f3f4f6" Foreground="Black" CornerRadius="8" Margin="0,6,0,0" Padding="12" SelectionChanged="VisibilityComboBox_SelectionChanged">
+                            <TextBlock Text="Visibility" Foreground="#00ADB5" FontSize="16"/>
+                            <ComboBox x:Name="VisibilityComboBox"
+                                   Background="#D9D9D9"
+                                   Foreground="Black"
+                                   CornerRadius="5"
+                                   SelectionChanged="VisibilityComboBox_SelectionChanged">
                                 <ComboBoxItem Content="Public" Tag="Public"/>
                                 <ComboBoxItem Content="Friends" Tag="Friends"/>
                                 <ComboBoxItem Content="Private" Tag="Private"/>
@@ -61,34 +97,68 @@
                         </StackPanel>
 
                         <!-- Group Selection (Visible only for Groups visibility) -->
-                        <StackPanel x:Name="GroupSelectionPanel" Spacing="8" Visibility="Collapsed">
-                            <TextBlock Text="Select Groups" Foreground="#2563eb" FontSize="20" FontWeight="SemiBold"/>
-                            <ListBox x:Name="GroupsListBox" Background="#f9fafb" Foreground="#222" SelectionMode="Single" MaxHeight="200" BorderThickness="0" CornerRadius="8" Margin="0,6,0,0" Padding="12">
+                        <StackPanel x:Name="GroupSelectionPanel" 
+                                Spacing="8"
+                                Visibility="Collapsed">
+                            <TextBlock Text="Select Groups" Foreground="#2563eb" FontSize="20" FontWeight="Bold"/>
+                            <ListBox x:Name="GroupsListBox"
+                                  Background="Black"
+                                  Foreground="Black"
+                                  SelectionMode="Single"
+                                  MaxHeight="200">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <CheckBox Content="{Binding Name}" Margin="5"/>
+                                        <CheckBox Content="{Binding Name}"
+                                               Margin="5"/>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </StackPanel>
 
-                        <!-- Tags (updated to pill-shaped, colored radio buttons) -->
+                        <!-- Tags -->
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Tags" Foreground="#2563eb" FontSize="20" FontWeight="SemiBold"/>
-                            <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,10,0,0">
-                                <RadioButton x:Name="MiscRadioButton" Content="Misc" Background="#e0e7ff" Foreground="#2563eb" BorderThickness="0" CornerRadius="999" Padding="8,18" FontWeight="Medium"/>
-                                <RadioButton x:Name="FoodRadioButton" Content="Food" Background="#fef9c3" Foreground="#b45309" BorderThickness="0" CornerRadius="999" Padding="8,18" FontWeight="Medium"/>
-                                <RadioButton x:Name="WorkoutRadioButton" Content="Workout" Background="#bbf7d0" Foreground="#15803d" BorderThickness="0" CornerRadius="999" Padding="8,18" FontWeight="Medium"/>
-                                <RadioButton x:Name="BlessedRadioButton" Content="Blessed" Background="#fee2e2" Foreground="#b91c1c" BorderThickness="0" CornerRadius="999" Padding="8,18" FontWeight="Medium"/>
+                            <TextBlock Text="Tags" Foreground="#2563eb" FontSize="20" FontWeight="Bold"/>
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <RadioButton x:Name="MiscRadioButton" 
+                                        Content="Misc"
+                                        Background="#f3f4f6" 
+                                        Foreground="Black"
+                                        CornerRadius="5" 
+                                        Padding="12 6"/>
+                                <RadioButton x:Name="FoodRadioButton" 
+                                        Content="Food"
+                                        Background="#f3f4f6" 
+                                        Foreground="Black"
+                                        CornerRadius="5" 
+                                        Padding="12 6"/>
+                                <RadioButton x:Name="WorkoutRadioButton" 
+                                        Content="Workout"
+                                        Background="#f3f4f6" 
+                                        Foreground="Black"
+                                        CornerRadius="5" 
+                                        Padding="12 6"/>
                             </StackPanel>
                         </StackPanel>
 
                         <!-- Error Message & Action Buttons -->
                         <StackPanel Spacing="20">
-                            <TextBlock x:Name="ErrorMessage" Foreground="Red" Visibility="Collapsed"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
-                                <Button Content="Cancel" Background="#f3f4f6" Foreground="#222" CornerRadius="8" FontWeight="Medium" Padding="10,24" BorderThickness="0" Click="CancelButton_Click"/>
-                                <Button Content="Post" Background="#2563eb" Foreground="White" CornerRadius="8" FontWeight="Medium" Padding="10,24" BorderThickness="0" Click="PostButton_Click"/>
+                            <TextBlock x:Name="ErrorMessage" 
+                                  Foreground="Red" 
+                                  Visibility="Collapsed"/>
+
+                            <StackPanel Orientation="Horizontal" 
+                                   HorizontalAlignment="Right"
+                                   Spacing="12">
+                                <Button Content="Cancel"
+                                   Background="#e5e7eb"
+                                   Foreground="Black"
+                                   CornerRadius="5"
+                                   Click="CancelButton_Click"/>
+                                <Button Content="Post"
+                                   Background="#2563eb"
+                                   Foreground="White"
+                                   CornerRadius="5"
+                                   Click="PostButton_Click"/>
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>

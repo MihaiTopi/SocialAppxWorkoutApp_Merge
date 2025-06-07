@@ -17,12 +17,12 @@ namespace NeoIsisJob.Views
             this.userService = new UserServiceProxy();
         }
 
-        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string username = UsernameTextBox.Text.Trim();
             string password = PasswordBox.Password;
 
-            UserModel? user = this.userService.GetUserByUsername(username);
+            UserModel? user = await this.userService.GetUserByUsername(username);
             if (user == null)
             {
                 // Empty fields

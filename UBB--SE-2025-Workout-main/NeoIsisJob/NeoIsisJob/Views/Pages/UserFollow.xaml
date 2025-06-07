@@ -7,76 +7,35 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="#f3f4f6">
+    Background="White">
 
-    <Grid>
-        <StackPanel Padding="40,20,40,20" HorizontalAlignment="Center" Width="700">
+
+    <Grid Padding="20">
+        <StackPanel>
 
             <!-- Back Button -->
-            <Button Content="← Back to Posts"
-                    Click="BackButton_Click"
-                    Margin="0,0,0,28"
-                    Background="#2563eb"
-                    Foreground="White"
-                    CornerRadius="8"
-                    FontWeight="SemiBold"
-                    Padding="10,24"
-                    HorizontalAlignment="Left">
+            <Button Content="← Back"
+                Click="BackButton_Click"
+                Width="80"
+                Margin="0,0,0,10"
+                Background="Black"
+                Foreground="White">
                 <Button.Resources>
-                    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#1d4ed8"/>
+                    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Black"/>
                     <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="White"/>
                 </Button.Resources>
             </Button>
 
-            <!-- Main Content Card -->
-            <Border Background="#fff" CornerRadius="16" Padding="40,32,40,32" VerticalAlignment="Top">
-                <StackPanel Spacing="20">
-                    <TextBlock Text="Discover Users" Foreground="#2563eb" FontSize="28" FontWeight="Bold" Margin="0,0,0,12"/>
+            <!-- Search Box -->
+            <TextBox x:Name="SearchBox" PlaceholderText="Search users..." Margin="0,0,0,10" TextChanged="SearchBox_TextChanged"/>
 
-                    <!-- Search Box -->
-                    <TextBox x:Name="SearchBox" PlaceholderText="Search by username..." Margin="0,0,0,20" TextChanged="SearchBox_TextChanged"
-                             Background="#f3f4f6" BorderThickness="0" CornerRadius="8" Padding="12" FontSize="16"/>
+            <!-- Scrollable list of users -->
+            <ScrollViewer Height="500">
+                <StackPanel x:Name="UserListPanel" />
+            </ScrollViewer>
 
-                    <!-- User List (using ItemsControl) -->
-                    <!-- You will need to bind your collection of UserModel objects to the ItemsSource in the code-behind -->
-                    <ItemsControl x:Name="UserItemsControl">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <!-- Template for each user item -->
-                                <Border Background="#f9fafb" CornerRadius="8" Padding="14,16" Margin="0,0,0,12">
-                                    <Grid ColumnSpacing="10">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <!-- Bind to your UserModel properties -->
-                                        <TextBlock Text="{Binding Username}" FontWeight="SemiBold" Foreground="#222" VerticalAlignment="Center" Grid.Column="0"/>
-                                        
-                                        <!-- Follow/Unfollow Button - Logic needs to be handled in Code-behind based on the bound user object -->
-                                        <!-- Example: You'll likely need a property in your UserModel or a ViewModel indicating if the current user is following this user -->
-                                        <!-- And the Click handler logic will need to update the status and potentially the button's appearance -->
-                                        <!-- For simplicity, showing a placeholder button structure -->
-                                        <Button Content="{Binding FollowButtonText}" 
-                                                Background="{Binding FollowButtonBackground}" 
-                                                Foreground="White"
-                                                CornerRadius="8"
-                                                FontWeight="SemiBold"
-                                                Padding="8,20"
-                                                Grid.Column="1"
-                                                Click="FollowToggleButton_Click" Tag="{Binding ID}">
-                                                <!-- You might need Converters or ViewModel logic to set Content, Background dynamically -->
-                                        </Button>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <!-- Removed ScrollViewer around StackPanel - ItemsControl handles scrolling if its parent allows -->
-
-                </StackPanel>
-            </Border>
         </StackPanel>
+
     </Grid>
 
 </Page>

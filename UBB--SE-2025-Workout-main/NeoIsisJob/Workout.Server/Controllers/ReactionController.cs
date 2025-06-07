@@ -25,11 +25,11 @@ namespace ServerAPIProject.Controllers
         //}
 
         [HttpPost]
-        public IActionResult SaveReaction([FromBody] Reaction entity)
+        public async Task<IActionResult> SaveReaction([FromBody] Reaction entity)
         {
             try
             {
-                this.reactionService.AddReaction(entity);
+                await this.reactionService.AddReaction(entity);
                 return this.Ok();
             }
             catch (Exception ex)

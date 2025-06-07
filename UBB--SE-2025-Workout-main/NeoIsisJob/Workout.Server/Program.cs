@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using ServerLibraryProject.Interfaces;
@@ -141,6 +140,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+/*
 // Auto-open Swagger UI in browser when running from terminal (Windows)
 if (app.Environment.IsDevelopment())
 {
@@ -161,6 +161,5 @@ if (app.Environment.IsDevelopment())
         }
     });
 }
-
-
+*/
 app.Run();

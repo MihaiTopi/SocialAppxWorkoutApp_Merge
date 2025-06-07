@@ -21,11 +21,11 @@
         }
 
         [HttpGet]
-        public ActionResult<List<Post>> GetAllPosts()
+        public async Task<ActionResult<List<Post>>> GetAllPosts()
         {
             try
             {
-                return this.Ok(this.postService.GetAllPosts());
+                return this.Ok(await this.postService.GetAllPosts());
             }
             catch (Exception ex)
             {
@@ -34,13 +34,15 @@
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Post> GetPostById(long id)
+        public async Task<ActionResult<Post>> GetPostById(long id)
         {
             try
             {
-                var post = this.postService.GetPostById(id);
+                var post = await this.postService.GetPostById(id);
                 if (post == null)
+                {
                     return this.NotFound($"Post with ID {id} not found.");
+                }
 
                 return this.Ok(post);
             }
@@ -51,11 +53,11 @@
         }
 
         [HttpGet("user/{userId}")]
-        public ActionResult<List<Post>> GetPostsByUserId(int userId)
+        public async Task<ActionResult<List<Post>>> GetPostsByUserId(int userId)
         {
             try
             {
-                return this.Ok(this.postService.GetPostsByUserId(userId));
+                return this.Ok(await this.postService.GetPostsByUserId(userId));
             }
             catch (Exception ex)
             {
@@ -64,11 +66,11 @@
         }
 
         [HttpGet("group/{groupId}")]
-        public ActionResult<List<Post>> GetPostsByGroupId(long groupId)
+        public async Task<ActionResult<List<Post>>> GetPostsByGroupId(long groupId)
         {
             try
             {
-                return this.Ok(postService.GetPostsByGroupId(groupId));
+                return this.Ok(await this.postService.GetPostsByGroupId(groupId));
             }
             catch (Exception ex)
             {
@@ -77,11 +79,12 @@
         }
 
         [HttpGet("user/{userId}/homefeed")]
-        public ActionResult<List<Post>> GetHomeFeed(int userId)
+        public async Task<ActionResult<List<Post>>> GetHomeFeed(int userId)
         {
             try
             {
-                return this.Ok(this.postService.GetPostsHomeFeed(userId));
+                var posts = await this.postService.GetPostsHomeFeed(userId);
+                return this.Ok(posts);
             }
             catch (Exception ex)
             {
@@ -89,28 +92,15 @@
             }
         }
 
-        //[HttpGet("user/{userId}/groupfeed")]
-        //public ActionResult<List<Post>> GetGroupFeed(long userId)
-        //{
-        //    try
-        //    {
-        //        return this.Ok(this.postService.GetPostsGroupsFeed(userId));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return this.StatusCode(404, $"Error retrieving group feed: {ex.Message}");
-        //    }
-        //}
-
         [HttpPost]
-        public IActionResult SavePost(Post post)
+        public async Task<IActionResult> SavePost(Post post)
         {
             try
             {
                 if (post == null)
                     return this.BadRequest("Post data cannot be null.");
 
-                this.postService.AddPost(post.Title, post.Content, post.UserId, post.GroupId, post.Visibility, post.Tag);
+                await this.postService.AddPost(post.Title, post.Content, post.UserId, post.GroupId, post.Visibility, post.Tag);
                 return this.Ok();
             }
             catch (Exception ex)
@@ -120,17 +110,17 @@
         }
 
         [HttpGet("{postId}/reactions")]
-        public ActionResult<List<Reaction>> GetReactionsByPost(long postId)
+        public async Task<ActionResult<List<Reaction>>> GetReactionsByPost(long postId)
         {
-            return this.reactionService.GetReactionsByPostId(postId);
+            return await this.reactionService.GetReactionsByPostId(postId);
         }
 
         [HttpGet("{postId}/user/{userId}/reaction")]
-        public ActionResult<Reaction> GetUserPostReaction(int userId, long postId)
+        public async Task<ActionResult<Reaction>> GetUserPostReaction(int userId, long postId)
         {
             try
             {
-                return this.reactionService.GetReaction(userId, postId);
+                return await this.reactionService.GetReaction(userId, postId);
             }
             catch (Exception ex)
             {
@@ -138,24 +128,10 @@
             }
         }
 
-        //[HttpDelete("{postId}/user/{userId}/reaction")]
-        //public IActionResult DeleteReaction(long userId, long postId)
-        //{
-        //    try
-        //    {
-        //        this.reactionService.DeleteReaction(userId, postId);
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return this.NotFound($"Reaction not found for user {userId} on post {postId}. Error: {ex.Message}");
-        //    }
-        //}
-
         [HttpGet("{postId}/comments")]
-        public ActionResult<List<Comment>> GetCommentsByPostId(long postId)
+        public async Task<ActionResult<List<Comment>>> GetCommentsByPostId(long postId)
         {
-            var comments = this.commentService.GetCommentsByPostId(postId);
+            var comments = await this.commentService.GetCommentsByPostId(postId);
             return this.Ok(comments);
         }
     }

@@ -1,11 +1,12 @@
 namespace DesktopProject.Components
 {
-    using DesktopProject.Proxies;
+    using System.Threading.Tasks;
     using DesktopProject.ViewModels;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
     using NeoIsisJob;
-    using NeoIsisJob.Proxy;
+    using Workout.Core.IServices;
 
     public sealed partial class PostsFeed : UserControl
     {
@@ -19,16 +20,24 @@ namespace DesktopProject.Components
         {
             this.InitializeComponent();
 
-            var userServiceProxy = new UserServiceProxy();
-            var postRepository = new PostServiceProxy();
-            var groupRepository = new GroupServiceProxy(); // ar trebui sa fie Service si cu dependency injection nu cu new trebuie schimbat
-            var postService = new PostServiceProxy();
+            var postService = App.Services.GetService<IPostService>();
+
             this.postViewModel = new PostViewModel(postService);
-            this.LoadPosts();
+            this.Loaded += PostsFeed_Loaded;
+        }
+
+        private async void PostsFeed_Loaded(object sender, RoutedEventArgs e)
+        {
+            var postService = App.Services.GetService<IPostService>();
+            this.postViewModel = new PostViewModel(postService);
+
+            int userId = AppController.CurrentUser?.ID ?? -1;
+
+            await this.postViewModel.PopulatePostsHomeFeed(userId);
             this.DisplayCurrentPage();
         }
 
-        private void LoadPosts()
+        private async Task LoadPosts()
         {
             int userId;
             if (AppController.CurrentUser == null)
@@ -40,7 +49,7 @@ namespace DesktopProject.Components
                 userId = AppController.CurrentUser.ID;
             }
 
-            this.postViewModel.PopulatePostsHomeFeed(userId);
+            await this.postViewModel.PopulatePostsHomeFeed(userId);
         }
 
         public void DisplayCurrentPage()
@@ -60,14 +69,14 @@ namespace DesktopProject.Components
             this.postViewModel.ClearPosts();
         }
 
-        public void PopulatePostsByGroupId(long groupId)
+        public async Task PopulatePostsByGroupId(long groupId)
         {
-            this.postViewModel.PopulatePostsByGroupId(groupId);
+            await this.postViewModel.PopulatePostsByGroupId(groupId);
         }
 
-        public void PopulatePostsByUserId(int userId)
+        public async Task PopulatePostsByUserId(int userId)
         {
-            this.postViewModel.PopulatePostsByUserId(userId);
+            await this.postViewModel.PopulatePostsByUserId(userId);
         }
 
         private void PreviousPageButton_Click(object sender, RoutedEventArgs e)
