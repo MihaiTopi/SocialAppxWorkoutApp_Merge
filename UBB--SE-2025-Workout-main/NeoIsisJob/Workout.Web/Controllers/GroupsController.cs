@@ -18,9 +18,9 @@ namespace ServerMVCProject.Controllers
         }
 
         [HttpGet("")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var groups = _groupService.GetAllGroups();
+            var groups = await _groupService.GetAllGroups();
             return View(groups);
         }
 
@@ -32,17 +32,17 @@ namespace ServerMVCProject.Controllers
 
         [HttpPost("create")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(CommonGroup group)
+        public async Task<IActionResult> Create(CommonGroup group)
         {
             if (ModelState.IsValid)
             {
-                _groupService.AddGroup(group.Name, group.Description);
+                await _groupService.AddGroup(group.Name, group.Description);
                 return RedirectToAction(nameof(Index));
             }
             return View(group);
         }
         [HttpPost("join/{id}")]
-        public IActionResult Join(int id)
+        public async Task<IActionResult> Join(int id)
         {
             string userIdStr = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
@@ -50,18 +50,18 @@ namespace ServerMVCProject.Controllers
             int userId = int.Parse(userIdStr);
             try
             {
-                this.userService.JoinGroup(userId, id);
+                await this.userService.JoinGroup(userId, id);
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", ex.Message);
-                return View("Index", _groupService.GetAllGroups());
+                return View("Index", await _groupService.GetAllGroups());
             }
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost("exit/{id}")]
-        public IActionResult Exit(int id)
+        public async Task<IActionResult> Exit(int id)
         {
             string userIdStr = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
@@ -69,12 +69,12 @@ namespace ServerMVCProject.Controllers
             int userId = int.Parse(userIdStr);
             try
             {
-                this.userService.ExitGroup(userId, id);
+                await this.userService.ExitGroup(userId, id);
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", ex.Message);
-                return View("Index", _groupService.GetAllGroups());
+                return View("Index", await _groupService.GetAllGroups());
             }
             return RedirectToAction(nameof(Index));
         }
